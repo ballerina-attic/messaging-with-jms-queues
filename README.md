@@ -215,30 +215,57 @@ service<http> bookstoreService {
 
 ```
 
-Refer https://github.com/ballerina-guides/messaging-with-jms-queues/blob/master/bookstore/jmsProducer/bookstore_service.bal file to see the complete implementation of `bookstore_service.bal`.
+To see the complete implementation of file `bookstore_service.bal` refer
+https://github.com/ballerina-guides/messaging-with-jms-queues/blob/master/bookstore/jmsProducer/bookstore_service.bal.
 
-
-
-#### How to interact with this web service
-* POST `localhost:9090/cabBookingService/placeOrder` with appropriate payload
-
-Example payload: `{Source:"Colombo", Destination: "Kandy", Vehicle: "Car", PhoneNumber: "0777123123"}`
-
-Response for the above request will be in Application/Json format.
-
-To check the above service, either you can send the above mentioned POST request or simply run the 
-cab booking service client, which will initiate the POST request to the service and log the response from the server .
-
-#### Sample Response 
-```
-[cab-booking-service-client.bal] 2018-01-22 10:52:16,854 INFO  [] - {"message":"Order successful. You will get an SMS when a vehicle is available"} 
-[jms-producer.bal] 2018-01-22 10:52:32,469 INFO  [] - Phone number added to the message queue 
-[jms-consumer.bal] 2018-01-22 10:52:34,981 INFO  [] - Message received from jms-producer 
-[jms-consumer.bal] 2018-01-22 10:52:34,984 INFO  [] - Successfully sent SMS to: 0777123123 
-[jms-consumer.bal] 2018-01-22 10:52:34,985 INFO  [] - SMS Content: Hello user! Vehicle available for your journey
-```
 
 ## <a name="testing"></a> Testing 
+
+### <a name="try-it"></a> Try it Out
+
+1. Run both the http service `bookstoreService`, which acts as the JMS producer and JMS service `orderDeliverySystem`, which acts as the JMS consumer by entering the following commands in sperate terminals
+
+    ```bash
+    <SAMPLE_ROOT_DIRECTORY>$ ballerina run bookstore/jmsProducer/
+   ```
+
+    ```bash
+    <SAMPLE_ROOT_DIRECTORY>$ ballerina run bookstore/jmsConsumer/
+    ```
+   
+2. Invoke the `bookstoreService` by sending a GET request to check all the available books
+
+    ```bash
+    curl -v -X GET localhost:9090/bookstore/getAvailableBooks
+    ```
+
+     The bookstoreService should respond something similar,
+     ```
+    < HTTP/1.1 200 OK
+    ["Tom Jones","The Rainbow","Lolita","Atonement","Hamlet"]
+     ```
+   
+3. To place an order,
+
+    ```bash
+    curl -v -X POST -d \
+    '{"Name":"Bob", "Address":"20, Palm Grove, Colombo, Sri Lanka", "ContactNumber":"+94777123456", "BookName":"The Rainbow"}' \
+     "http://localhost:9090/bookstore/placeOrder" -H "Content-Type:application/json"
+    ```
+
+    The bookstoreService should respond something similar,
+    ```
+     < HTTP/1.1 200 OK
+    {"Message":"Your order is successfully placed. Ordered book will be delivered soon"}
+    ```
+
+    Sample Log Messages
+    ```
+    2018-02-23 21:22:21,268 INFO  [bookstore.jmsProducer] - New order added to the JMS Queue; CustomerName: 'Bob', OrderedBook: 'The Rainbow'; 
+
+    2018-02-23 21:22:24,181 INFO  [bookstore.jmsConsumer] - New order received from the JMS Queue 
+    2018-02-23 21:22:24,184 INFO  [bookstore.jmsConsumer] - Order Details: {"customerName":"Bob","address":"20, Palm Grove, Colombo, Sri Lanka","contactNumber":"+94777123456","orderedBookName":"The Rainbow"} 
+    ```
 
 ### <a name="unit-testing"></a> Writing Unit Tests 
 
