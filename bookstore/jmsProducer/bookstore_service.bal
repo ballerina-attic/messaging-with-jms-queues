@@ -15,7 +15,7 @@ struct order {
 // Global variable containing all the available books
 json[] bookInventory = ["Tom Jones", "The Rainbow", "Lolita", "Atonement", "Hamlet"];
 
-// Book store service, which allows user to order books online for delivery
+// Book store service, which allows users to order books online for delivery
 @http:configuration {basePath:"/bookStore"}
 service<http> bookstoreService {
     // Resource that allows users to place an order for a book
