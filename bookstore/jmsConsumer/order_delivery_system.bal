@@ -7,7 +7,7 @@ import ballerina.net.jms;
                       Connection factory type can be either queue or topic depending on the requirement."}
 
 // JMS Configurations
-// 'WSO2 MB server' from product 'EI' has been used as the message broker
+// 'WSO2 EI Message Broker' from product 'EI' has been used as the message broker
 @jms:configuration {
     initialContextFactory:"wso2mbInitialContextFactory",
     providerUrl:
