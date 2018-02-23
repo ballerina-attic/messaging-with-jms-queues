@@ -12,24 +12,124 @@ To understanding how you can use JMS queues for messaging, let's consider a real
 
 
 
-In this example WSO2 MB server has been used as the JMS broker. Ballerina JMS Connector is used to connect Ballerina 
+In this example WSO2 EI Message Broker has been used as the JMS broker. Ballerina JMS Connector is used to connect Ballerina 
 and JMS Message Broker. With this JMS Connector, Ballerina can act as both JMS Message Consumer and JMS Message 
 Producer.
 
+## <a name="pre-req"></a> Prerequisites
+ 
+- JDK 1.8 or later
+- Ballerina Distribution (Install Instructions:  https://ballerinalang.org/docs/quick-tour/quick-tour/#install-ballerina)
+- Ballerina JMS Connector (Download: https://github.com/ballerinalang/connector-jms/releases)
+  * After downloading the zip file, extract it and copy the containing jars into <BALLERINA_HOME>/bre/lib folder
+- A JMS Broker (Example: WSO2 EI Message Broker - Refer: https://docs.wso2.com/display/EI611/Message+Brokering)
+  * After downloading and installing, copy the JMS Broker Client jars into <BALLERINA_HOME>/bre/lib folder
+- A Text Editor or an IDE 
 
-## How to Run
-1) Go to https://ballerinalang.org and click Download.
-2) Download the Ballerina Tools distribution and unzip it on your computer. Ballerina Tools includes the Ballerina 
-runtime plus the visual editor (Composer) and other tools.
-3) Add the `<BALLERINA_HOME>/bin` directory to your $PATH environment variable so that you can run the Ballerina 
-commands from anywhere.
-4) Go to https://ballerinalang.org/connectors and download JMS Connector.
-5) Extract `ballerina-jms-connector-<version>.zip` and copy containing jars into `<BALLERINA_HOME>/bre/lib/`
-6) Download a JMS Broker client and copy its jars into `<BALLERINA_HOME>/bre/lib/` (Here, WSO2 MB is used as the JMS 
-Broker client)
-7) Start the JMS broker server you downloaded.
-8) After that, navigate to the `MessagingWithJMS` folder and run the followings in the same order: 
-`$ ballerina run jms-producer.bal`, `$ ballerina run jms-consumer.bal`, `$ ballerina run cab-booking-service-client.bal`
+Optional Requirements
+- Docker (Follow instructions in https://docs.docker.com/engine/installation/)
+- Ballerina IDE plugins. ( IntelliJ IDEA, VSCode, Atom)
+- Testerina (Refer: https://github.com/ballerinalang/testerina)
+- Container-support (Refer: https://github.com/ballerinalang/container-support)
+- Docerina (Refer: https://github.com/ballerinalang/docerina)
+
+## <a name="developing-service"></a> Developing the Service
+
+### <a name="before-begin"></a> Before You Begin
+##### Understand the Package Structure
+Ballerina is a complete programming language that can have any custom project structure as you wish. Although language allows you to have any package structure, we'll stick with the following package structure for this project.
+
+```
+messaging-with-jms-queues
+├── bookstore
+│   ├── jmsConsumer
+│   │   └── order_delivery_system.bal
+│   ├── jmsProducer
+│   │   ├── bookstore_service.bal
+│   │   ├── bookstore_service_test.bal
+│   │   └── jmsUtil
+│   │       ├── jms_producer_utils.bal
+│   │       └── jms_producer_utils_test.bal
+│   └── resources
+│       └── jndi.properties
+└── README.md
+
+```
+
+The `jmsConsumer` package contains file that handles the logic of message consumption from the JMS queue.
+
+The `jmsProducer` package contains files that handle the JMS message producing logic and test files. 
+
+The `resources` package contains `jndi.properties` file, which manages connections for JMS.
+
+##### Understand the `jndi.properties` File
+
+```properties
+# Register the connection factory
+# connectionfactory.[jndiname] = [ConnectionURL]
+connectionfactory.QueueConnectionFactory = amqp://admin:admin@clientID/carbon?brokerlist='tcp://localhost:5675'
+
+# Register the queue in JNDI
+# queue.[jndiName] = [physicalName]
+queue.OrderQueue = OrderQueue
+# Queue used for testing
+queue.TestQueue = TestQueue
+```
+
+The above segment contains the `jndi.properties` file used in this sample. This file contains the details to manage connections for JMS. For this point-to-point example, we require to register the `connectionfactory.[jndiname]` and 
+`queue.[jndiName]`. Inline comments added for clear understanding.
+
+### <a name="Implementation"></a> Implementation
+
+Let's get started with the implementation of `jms_producer_utils.bal`file, which contains the JMS configurations required by the message producer. Refer the code attached below.
+
+##### jms_producer_utils.bal
+```ballerina
+package bookstore.jmsProducer.jmsUtil;
+
+import ballerina.net.jms;
+import ballerina.log;
+
+// Function to add messages to the JMS queue
+public function addToJmsQueue (string queueName, string message) (error jmsError) {
+    endpoint<jms:JmsClient> jmsEP {
+    }
+
+    // Try obtaining JMS client and add the order to the JMS queue
+    try {
+        jms:JmsClient jmsClient = create jms:JmsClient(getConnectorConfig());
+        bind jmsClient with jmsEP;
+        // Create an empty Ballerina message
+        jms:JMSMessage queueMessage = jms:createTextMessage(getConnectorConfig());
+        // Set a string payload to the message
+        queueMessage.setTextMessageContent(message);
+        // Send the message to the JMS provider
+        jmsEP.send(queueName, queueMessage);
+    } catch (error err) {
+        log:printError(err.msg);
+        // If obtaining JMS client fails, catch and return the error message
+        jmsError = err;
+    }
+
+    return;
+}
+
+// Private function to get the JMS client connector configurations
+function getConnectorConfig () (jms:ClientProperties properties) {
+    // JMS client properties
+    // 'providerUrl' or 'configFilePath', and the 'initialContextFactory' vary according to the JMS provider you use
+    // 'WSO2 MB server' from product 'EI' has been used as the message broker in this example
+    properties = {initialContextFactory:"wso2mbInitialContextFactory",
+                     providerUrl:"amqp://admin:admin@carbon/carbon?brokerlist='tcp://localhost:5675'",
+                     connectionFactoryName:"QueueConnectionFactory",
+                     connectionFactoryType:"queue"};
+    return;
+}
+
+```
+
+In the above implementation, function `getConnectorConfig()` is used to get the JMS client connector configurations.
+This function returns `jms:ClientProperties` required by the JMS client. Fields `initialContextFactory`, `providerUrl`, `connectionFactoryName` and `connectionFactoryType` determine the properties needed for the JMS client. Instead of `providerUrl` you could also provide `configFilePath`, which will be the file path of your `jndi.properties` file.  
 
 #### How to interact with this web service
 * POST `localhost:9090/cabBookingService/placeOrder` with appropriate payload
