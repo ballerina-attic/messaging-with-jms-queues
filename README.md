@@ -118,7 +118,7 @@ public function addToJmsQueue (string queueName, string message) (error jmsError
 function getConnectorConfig () (jms:ClientProperties properties) {
     // JMS client properties
     // 'providerUrl' or 'configFilePath', and the 'initialContextFactory' vary according to the JMS provider you use
-    // 'WSO2 MB server' from product 'EI' has been used as the message broker in this example
+    // 'WSO2 EI Message Broker' from product 'EI' has been used as the message broker in this example
     properties = {initialContextFactory:"wso2mbInitialContextFactory",
                      providerUrl:"amqp://admin:admin@carbon/carbon?brokerlist='tcp://localhost:5675'",
                      connectionFactoryName:"QueueConnectionFactory",
@@ -149,7 +149,7 @@ import ballerina.net.jms;
                       Connection factory type can be either queue or topic depending on the requirement."}
 
 // JMS Configurations
-// 'WSO2 MB server' from product 'EI' has been used as the message broker
+// 'WSO2 EI Message Broker' from product 'EI' has been used as the message broker
 @jms:configuration {
     initialContextFactory:"wso2mbInitialContextFactory",
     providerUrl:
