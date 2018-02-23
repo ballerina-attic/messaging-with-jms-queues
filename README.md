@@ -272,32 +272,39 @@ https://github.com/ballerina-guides/messaging-with-jms-queues/blob/master/bookst
 In ballerina, the unit test cases should be in the same package and the naming convention should be as follows,
 * Test files should contain _test.bal suffix.
 * Test functions should contain test prefix.
-  * e.g.: testOrderService()
+  * e.g.: testBookstoreService()
 
-This guide contains unit test cases in the respective folders. The two test cases are written to test the `orderServices` and the `inventoryStores` service.
+This guide contains unit test cases for each method implemented in `jms_producer_utils.bal` and `bookstore_service.bal` files.
+Test files are in the same packages in which the above files are located.
+
 To run the unit tests, go to the sample root directory and run the following command
 ```bash
-$ ballerina test orderServices/
+$ ballerina test bookstore/jmsProducer/
 ```
 
-```bash
-$ ballerina test inventoryServices/
-```
+To check the implementations of these test files, please go to https://github.com/ballerina-guides/messaging-with-jms-queues/blob/master/bookstore/jmsProducer/ and refer the respective folders of `jms_producer_utils.bal` and `bookstore_service.bal` files. 
 
 ## <a name="deploying-the-scenario"></a> Deployment
 
 Once you are done with the development, you can deploy the service using any of the methods that we listed below. 
 
 ### <a name="deploying-on-locally"></a> Deploying Locally
-You can deploy the RESTful service that you developed above, in your local environment. You can use the Ballerina executable archive (.balx) archive that we created above and run it in your local environment as follows. 
+You can deploy the RESTful service that you developed above, in your local environment. You can create the Ballerina executable archive (.balx) first and then run it in your local environment as follows,
+
+Building 
+```bash
+ $ ballerina build bookstore/jmsConsumer/
+ 
+ $ ballerina build bookstore/jmsProducer/
 
 ```
-ballerina run orderServices.balx 
-```
 
+Running
+```bash
+$ ballerina run jmsConsumer.balx 
 
-```
-ballerina run inventoryServices.balx 
+$ ballerina run jmsProducer.balx 
+
 ```
 
 ### <a name="deploying-on-docker"></a> Deploying on Docker
