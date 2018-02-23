@@ -77,11 +77,11 @@ queue.TestQueue = TestQueue
 ```
 
 The above segment contains the `jndi.properties` file used in this sample. This file contains the details to manage connections for JMS. For this point-to-point example, we require to register the `connectionfactory.[jndiname]` and 
-`queue.[jndiName]`. Inline comments added for clear understanding.
+`queue.[jndiName]`. 
 
 ### <a name="Implementation"></a> Implementation
 
-Let's get started with the implementation of `jms_producer_utils.bal`file, which contains the JMS configurations required by the message producer. Refer the code attached below.
+Let's get started with the implementation of `jms_producer_utils.bal`file, which contains the JMS configurations required by the message producer. Refer the code attached below. Inline comments are added for better understanding.
 
 ##### jms_producer_utils.bal
 ```ballerina
@@ -128,8 +128,96 @@ function getConnectorConfig () (jms:ClientProperties properties) {
 
 ```
 
-In the above implementation, function `getConnectorConfig()` is used to get the JMS client connector configurations.
-This function returns `jms:ClientProperties` required by the JMS client. Fields `initialContextFactory`, `providerUrl`, `connectionFactoryName` and `connectionFactoryType` determine the properties needed for the JMS client. Instead of `providerUrl` you could also provide `configFilePath`, which will be the file path of your `jndi.properties` file.  
+In the above implementation, private function `getConnectorConfig()` is used to get the JMS client connector configurations.
+This function returns `jms:ClientProperties` required by the JMS client. Fields `initialContextFactory`, `providerUrl`, `connectionFactoryName` and `connectionFactoryType` determine the properties needed for the JMS client. Instead of `providerUrl` you could also provide `configFilePath`, which will be the file path of your `jndi.properties` file.
+Change the `providerUrl` and the `initialContextFactory` according to the JMS provider you use. 
+
+Function `addToJmsQueue()` takes a message and a queue name as parameters and tries to add the message to the queue specified. It gets the JMS client configuration details by calling the method `getConnectorConfig()`. Function `addToJmsQueue()` returns an error if it fails to obtain the JMS client.
+
+
+Let's next focus on the implementation of `order_delivery_system.bal` file, which consists of the message consuming logic.
+Consider the below code. Inline comments are added for better understanding.
+
+##### order_delivery_system.bal
+```ballerina
+package bookstore.jmsConsumer;
+
+import ballerina.log;
+import ballerina.net.jms;
+
+@Description {value:"Service level annotation to provide connection details.
+                      Connection factory type can be either queue or topic depending on the requirement."}
+
+// JMS Configurations
+// 'WSO2 MB server' from product 'EI' has been used as the message broker
+@jms:configuration {
+    initialContextFactory:"wso2mbInitialContextFactory",
+    providerUrl:
+    "amqp://admin:admin@carbon/carbon?brokerlist='tcp://localhost:5675'",
+    connectionFactoryType:"queue",
+    connectionFactoryName:"QueueConnectionFactory",
+    destination:"OrderQueue"
+}
+
+// JMS service that consumes messages from the JMS queue
+service<jms> orderDeliverySystem {
+    // Triggered whenever an order is added to the 'OrderQueue'
+    resource onMessage (jms:JMSMessage message) {
+        log:printInfo("New order received from the JMS Queue");
+        // Retrieve the string payload using native function
+        string stringPayload = message.getTextMessageContent();
+        log:printInfo("Order Details: " + stringPayload);
+    }
+}
+
+```
+
+`orderDeliverySystem` is a JMS service, which acts as the JMS message receiver. We require to provide the JMS configuration details for this JMS service. `@jms:configuration {}` block contains these configurations. Except `destination` other fields are similar to what we had in the `getConnectorConfig()`. Field `destination` is used to specify the JMS queue name from which the consumer needs to consume messages. This should be the same name you specified for `[physicalName]` in line 
+`queue.[jndiName] = [physicalName]` in the `jndi.properties` file.
+
+Resource `onMessage` will be triggered whenever the queue specified as the destination gets populated. 
+
+
+Finally, let's focus on the implementation of `bookstore_service.bal` file, which contains the service logic for the online bookstore service use-case we considered. This service has two resourses namely `getAvailableBooks` and `placeOrder`.
+Resource `getAvailableBooks` can be consumed by a user to get a list of all the available books through a GET request. User will get a JSON response with the names of all the available books.
+Resource `placeOrder` can be consumed by a user to place an order for a book delivery. User needs to send a POST request with an appropriate JSON payload to the service. Service will then check for the availability of the book and send a JSON response to the user. If the book is available then the order will be added to the JMS queue `OrderQueue`, which will be consumed by the order delivery system later. Skeleton of the `bookstore_service.bal` is attached below.
+
+##### bookstore_service.bal
+```ballerina
+
+// Struct to construct an order
+struct order {
+   // Implementation
+}
+
+// Book store service, which allows users to order books online for delivery
+@http:configuration {basePath:"/bookStore"}
+service<http> bookstoreService {
+    // Resource that allows users to place an order for a book
+    @http:resourceConfig {methods:["POST"]}
+    resource placeOrder (http:Connection httpConnection, http:InRequest request) {
+     
+        // Try getting the JSON payload from the user request
+  
+        // Check whether the requested book available
+      
+        // If requested book is available then try adding the order to the JMS queue 'OrderQueue'
+        
+        // Send appropriate JSON response
+    }
+
+    // Resource that allows users to get a list of all the available books
+    @http:resourceConfig {methods:["GET"]}
+    resource getAvailableBooks (http:Connection httpConnection, http:InRequest request) {
+      // Send a JSON response with all the available books  
+    }
+}
+
+```
+
+Refer https://github.com/ballerina-guides/messaging-with-jms-queues/blob/master/bookstore/jmsProducer/bookstore_service.bal file to see the complete implementation of `bookstore_service.bal`.
+
+
 
 #### How to interact with this web service
 * POST `localhost:9090/cabBookingService/placeOrder` with appropriate payload
