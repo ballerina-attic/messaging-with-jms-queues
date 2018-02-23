@@ -1,18 +1,21 @@
-# Messaging with JMS
+# Messaging with JMS Queues
 
-This is a use-case example explains the process of publishing and subscribing to queue messages using a JMS broker.
+This guide walks you through the process of messaging with jms queues using a message broker in Ballerina language.
+Java Message Service (JMS) is used for sending messages between two or more clients. JMS support two models, point-to-point model and publish/subscribe model. This example is based on poit-to-point model where messages are routed to an individual consumer which maintains a queue of "incoming" messages. This messaging type is built on the concept of message queues, senders, and receivers. Each message is addressed to a specific queue, and the receiving clients extract messages from the queues established to hold their messages. In point-to-point model each message is guaranteed to be delivered, and consumed by one consumer in an asynchronous manner.
+
+## <a name="what-you-build"></a>  What you’ll Build
+To understanding how you can use JMS queues for messaging, let's consider a real-world use case of an online bookstore service using which a user can order books for home delivery. Once an order is placed, the service will add it to a JMS queue named "OrderQueue" if the order is valid. Hence, this bookstore service acts as the JMS message producer. An order delivery system, which acts as the JMS message consumer polls the "OrderQueue" and gets the order details whenever the queue becomes populated. The below diagram illustrates this use case clearly.
+
+
+
+![alt text](https://github.com/pranavan15/messaging-with-jms-queues/blob/master/images/JMSQueue.png)
+
+
+
 In this example WSO2 MB server has been used as the JMS broker. Ballerina JMS Connector is used to connect Ballerina 
-with JMS Message Broker. With the JMS Connector, Ballerina can act as both JMS Message Consumer and JMS Message 
+and JMS Message Broker. With this JMS Connector, Ballerina can act as both JMS Message Consumer and JMS Message 
 Producer.
 
-This example consists of a simple cab booking service using which a user can book a vehicle for his/her journey by 
-specifying source, destination, preferred vehicle type and phone number. Once a vehicle of preferred type is available, 
-server will add the phone number of that user to a JMS queue. A JMS service, which acts as a JMS-consumer will then 
-consume the message from the queue and send an SMS to user's phone number stating that a vehicle is available for 
-his/her journey. This process is done asynchronously with the help of JMS. That is to say, a user does not want to 
-wait in the http connection until a vehicle becomes available. `jms-producer.bal` contains the cab service logic as 
-well as jms message producing logic. `jms-consumer.bal` contains jms message consuming logic. 
-`cab-booking-service-client.bal` is used to initiate a http request to the cab booking service.
 
 ## How to Run
 1) Go to https://ballerinalang.org and click Download.
@@ -46,3 +49,57 @@ cab booking service client, which will initiate the POST request to the service 
 [jms-consumer.bal] 2018-01-22 10:52:34,984 INFO  [] - Successfully sent SMS to: 0777123123 
 [jms-consumer.bal] 2018-01-22 10:52:34,985 INFO  [] - SMS Content: Hello user! Vehicle available for your journey
 ```
+
+## <a name="testing"></a> Testing 
+
+### <a name="unit-testing"></a> Writing Unit Tests 
+
+In ballerina, the unit test cases should be in the same package and the naming convention should be as follows,
+* Test files should contain _test.bal suffix.
+* Test functions should contain test prefix.
+  * e.g.: testOrderService()
+
+This guide contains unit test cases in the respective folders. The two test cases are written to test the `orderServices` and the `inventoryStores` service.
+To run the unit tests, go to the sample root directory and run the following command
+```bash
+$ ballerina test orderServices/
+```
+
+```bash
+$ ballerina test inventoryServices/
+```
+
+## <a name="deploying-the-scenario"></a> Deployment
+
+Once you are done with the development, you can deploy the service using any of the methods that we listed below. 
+
+### <a name="deploying-on-locally"></a> Deploying Locally
+You can deploy the RESTful service that you developed above, in your local environment. You can use the Ballerina executable archive (.balx) archive that we created above and run it in your local environment as follows. 
+
+```
+ballerina run orderServices.balx 
+```
+
+
+```
+ballerina run inventoryServices.balx 
+```
+
+### <a name="deploying-on-docker"></a> Deploying on Docker
+(Work in progress) 
+
+### <a name="deploying-on-k8s"></a> Deploying on Kubernetes
+(Work in progress) 
+
+
+## <a name="observability"></a> Observability 
+
+### <a name="logging"></a> Logging
+(Work in progress) 
+
+### <a name="metrics"></a> Metrics
+(Work in progress) 
+
+
+### <a name="tracing"></a> Tracing 
+(Work in progress) 
