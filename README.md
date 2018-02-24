@@ -12,7 +12,7 @@ To understanding how you can use JMS queues for messaging, let's consider a real
 
 
 
-In this example Apache ActiveMQ has been used as the JMS broker. Ballerina JMS Connector is used to connect Ballerina 
+In this example `Apache ActiveMQ` has been used as the JMS broker. Ballerina JMS Connector is used to connect Ballerina 
 and JMS Message Broker. With this JMS Connector, Ballerina can act as both JMS Message Consumer and JMS Message 
 Producer.
 
@@ -68,13 +68,14 @@ The `resources` package contains `jndi.properties` file, which manages connectio
 ```properties
 # Register the connection factory
 # connectionfactory.[jndiname] = [ConnectionURL]
-connectionfactory.QueueConnectionFactory = amqp://admin:admin@clientID/carbon?brokerlist='tcp://localhost:5675'
+connectionfactory.QueueConnectionFactory = tcp://localhost:61616
 
 # Register the queue in JNDI
 # queue.[jndiName] = [physicalName]
 queue.OrderQueue = OrderQueue
 # Queue used for testing
 queue.TestQueue = TestQueue
+
 ```
 
 The above segment contains the `jndi.properties` file used in this sample. This file contains the details to manage connections for JMS. For this point-to-point example, we require to register the `connectionfactory.[jndiname]` and 
@@ -120,8 +121,8 @@ function getConnectorConfig () (jms:ClientProperties properties) {
     // JMS client properties
     // 'providerUrl' or 'configFilePath', and the 'initialContextFactory' vary according to the JMS provider you use
     // 'Apache ActiveMQ' has been used as the message broker in this example
-    properties = {initialContextFactory:"wso2mbInitialContextFactory",
-                     providerUrl:"amqp://admin:admin@carbon/carbon?brokerlist='tcp://localhost:5675'",
+    properties = {initialContextFactory:"org.apache.activemq.jndi.ActiveMQInitialContextFactory",
+                     providerUrl:"tcp://localhost:61616",
                      connectionFactoryName:"QueueConnectionFactory",
                      connectionFactoryType:"queue"};
     return;
@@ -152,9 +153,9 @@ import ballerina.net.jms;
 // JMS Configurations
 // 'Apache ActiveMQ' has been used as the message broker
 @jms:configuration {
-    initialContextFactory:"wso2mbInitialContextFactory",
+    initialContextFactory:"org.apache.activemq.jndi.ActiveMQInitialContextFactory",
     providerUrl:
-    "amqp://admin:admin@carbon/carbon?brokerlist='tcp://localhost:5675'",
+    "tcp://localhost:61616",
     connectionFactoryType:"queue",
     connectionFactoryName:"QueueConnectionFactory",
     destination:"OrderQueue"
@@ -224,7 +225,13 @@ https://github.com/ballerina-guides/messaging-with-jms-queues/blob/master/bookst
 
 ### <a name="try-it"></a> Try it Out
 
-1. Run both the http service `bookstoreService`, which acts as the JMS producer and JMS service `orderDeliverySystem`, which acts as the JMS consumer by entering the following commands in sperate terminals
+1. Start `Apache ActiveMQ` server by entering the following command in a terminal
+
+   ```bash
+   <ActiveMQ_BIN_DIRECTORY>$ ./activemq start
+   ```
+
+2. Run both the http service `bookstoreService`, which acts as the JMS producer and JMS service `orderDeliverySystem`, which acts as the JMS consumer by entering the following commands in sperate terminals
 
     ```bash
     <SAMPLE_ROOT_DIRECTORY>$ ballerina run bookstore/jmsProducer/
@@ -234,7 +241,7 @@ https://github.com/ballerina-guides/messaging-with-jms-queues/blob/master/bookst
     <SAMPLE_ROOT_DIRECTORY>$ ballerina run bookstore/jmsConsumer/
     ```
    
-2. Invoke the `bookstoreService` by sending a GET request to check all the available books
+3. Invoke the `bookstoreService` by sending a GET request to check all the available books
 
     ```bash
     curl -v -X GET localhost:9090/bookstore/getAvailableBooks
@@ -246,7 +253,7 @@ https://github.com/ballerina-guides/messaging-with-jms-queues/blob/master/bookst
     ["Tom Jones","The Rainbow","Lolita","Atonement","Hamlet"]
      ```
    
-3. To place an order,
+4. To place an order,
 
     ```bash
     curl -v -X POST -d \
@@ -279,9 +286,9 @@ This guide contains unit test cases for each method implemented in `jms_producer
 Test files are in the same packages in which the above files are located.
 
 To run the unit tests, go to the sample root directory and run the following command
-```bash
-$ ballerina test bookstore/jmsProducer/
-```
+   ```bash
+   <SAMPLE_ROOT_DIRECTORY>$ ballerina test bookstore/jmsProducer/
+   ```
 
 To check the implementations of these test files, please go to https://github.com/ballerina-guides/messaging-with-jms-queues/blob/master/bookstore/jmsProducer/ and refer the respective folders of `jms_producer_utils.bal` and `bookstore_service.bal` files. 
 
@@ -293,20 +300,20 @@ Once you are done with the development, you can deploy the service using any of 
 You can deploy the RESTful service that you developed above, in your local environment. You can create the Ballerina executable archive (.balx) first and then run it in your local environment as follows,
 
 Building 
-```bash
- $ ballerina build bookstore/jmsConsumer/
- 
- $ ballerina build bookstore/jmsProducer/
+   ```bash
+    <SAMPLE_ROOT_DIRECTORY>$ ballerina build bookstore/jmsConsumer/
 
-```
+    <SAMPLE_ROOT_DIRECTORY>$ ballerina build bookstore/jmsProducer/
+
+   ```
 
 Running
-```bash
-$ ballerina run jmsConsumer.balx 
+   ```bash
+    <SAMPLE_ROOT_DIRECTORY>$ ballerina run jmsConsumer.balx 
 
-$ ballerina run jmsProducer.balx 
+    <SAMPLE_ROOT_DIRECTORY>$ ballerina run jmsProducer.balx 
 
-```
+   ```
 
 ### <a name="deploying-on-docker"></a> Deploying on Docker
 (Work in progress) 
