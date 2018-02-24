@@ -7,11 +7,11 @@ import ballerina.net.jms;
                       Connection factory type can be either queue or topic depending on the requirement."}
 
 // JMS Configurations
-// 'WSO2 EI Message Broker' from product 'EI' has been used as the message broker
+// 'Apache ActiveMQ' has been used as the message broker
 @jms:configuration {
-    initialContextFactory:"wso2mbInitialContextFactory",
+    initialContextFactory:"org.apache.activemq.jndi.ActiveMQInitialContextFactory",
     providerUrl:
-    "amqp://admin:admin@carbon/carbon?brokerlist='tcp://localhost:5675'",
+    "tcp://localhost:61616",
     connectionFactoryType:"queue",
     connectionFactoryName:"QueueConnectionFactory",
     destination:"OrderQueue"

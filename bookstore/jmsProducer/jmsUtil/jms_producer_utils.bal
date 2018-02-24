@@ -31,9 +31,9 @@ public function addToJmsQueue (string queueName, string message) (error jmsError
 function getConnectorConfig () (jms:ClientProperties properties) {
     // JMS client properties
     // 'providerUrl' or 'configFilePath', and the 'initialContextFactory' vary according to the JMS provider you use
-    // 'WSO2 EI Message Broker' from product 'EI' has been used as the message broker in this example
-    properties = {initialContextFactory:"wso2mbInitialContextFactory",
-                     providerUrl:"amqp://admin:admin@carbon/carbon?brokerlist='tcp://localhost:5675'",
+    // 'Apache ActiveMQ' has been used as the message broker in this example
+    properties = {initialContextFactory:"org.apache.activemq.jndi.ActiveMQInitialContextFactory",
+                     providerUrl:"tcp://localhost:61616",
                      connectionFactoryName:"QueueConnectionFactory",
                      connectionFactoryType:"queue"};
     return;
