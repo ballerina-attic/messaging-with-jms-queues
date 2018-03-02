@@ -28,11 +28,7 @@ Producer.
 - A Text Editor or an IDE 
 
 Optional Requirements
-- Docker (Follow instructions in https://docs.docker.com/engine/installation/)
 - Ballerina IDE plugins. ( IntelliJ IDEA, VSCode, Atom)
-- Testerina (Refer: https://github.com/ballerinalang/testerina)
-- Container-support (Refer: https://github.com/ballerinalang/container-support)
-- Docerina (Refer: https://github.com/ballerinalang/docerina)
 
 ## <a name="developing-service"></a> Developing the Service
 
