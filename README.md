@@ -3,7 +3,7 @@
 This guide walks you through the process of messaging with jms queues using a message broker in Ballerina language.
 Java Message Service (JMS) is used for sending messages between two or more clients. JMS support two models, point-to-point model and publish/subscribe model. This example is based on point-to-point model where messages are routed to an individual consumer which maintains a queue of "incoming" messages. This messaging type is built on the concept of message queues, senders, and receivers. Each message is addressed to a specific queue, and the receiving clients extract messages from the queues established to hold their messages. In point-to-point model each message is guaranteed to be delivered, and consumed by one consumer in an asynchronous manner.
 
-## <a name="what-you-build"></a>  What you’ll Build
+## <a name="what-you-build"></a>  What you’ll build
 To understanding how you can use JMS queues for messaging, let's consider a real-world use case of an online bookstore service using which a user can order books for home delivery. Once an order is placed, the service will add it to a JMS queue named "OrderQueue" if the order is valid. Hence, this bookstore service acts as the JMS message producer. An order delivery system, which acts as the JMS message consumer polls the "OrderQueue" and gets the order details whenever the queue becomes populated. The below diagram illustrates this use case clearly.
 
 
@@ -30,10 +30,10 @@ Producer.
 Optional Requirements
 - Ballerina IDE plugins (IntelliJ IDEA, VSCode, Atom)
 
-## <a name="developing-service"></a> Developing the Service
+## <a name="developing-service"></a> Developing the service
 
-### <a name="before-begin"></a> Before You Begin
-##### Understand the Package Structure
+### <a name="before-begin"></a> Before you begin
+##### Understand the package structure
 Ballerina is a complete programming language that can have any custom project structure as you wish. Although language allows you to have any package structure, we'll stick with the following package structure for this project.
 
 ```
@@ -59,7 +59,7 @@ The `jmsProducer` package contains files that handle the JMS message producing l
 
 The `resources` package contains `jndi.properties` file, which manages connections for JMS.
 
-##### Understand the `jndi.properties` File
+##### Understand the `jndi.properties` file
 
 ```properties
 # Register the connection factory
@@ -219,7 +219,7 @@ https://github.com/ballerina-guides/messaging-with-jms-queues/blob/master/bookst
 
 ## <a name="testing"></a> Testing 
 
-### <a name="try-it"></a> Try it Out
+### <a name="try-it"></a> Try it out
 
 1. Start `Apache ActiveMQ` server by entering the following command in a terminal
 
@@ -264,14 +264,14 @@ https://github.com/ballerina-guides/messaging-with-jms-queues/blob/master/bookst
     ```
 
     Sample Log Messages
-    ```
+    ```bash
     2018-02-23 21:22:21,268 INFO  [bookstore.jmsProducer] - New order added to the JMS Queue; CustomerName: 'Bob', OrderedBook: 'The Rainbow'; 
 
     2018-02-23 21:22:24,181 INFO  [bookstore.jmsConsumer] - New order received from the JMS Queue 
     2018-02-23 21:22:24,184 INFO  [bookstore.jmsConsumer] - Order Details: {"customerName":"Bob","address":"20, Palm Grove, Colombo, Sri Lanka","contactNumber":"+94777123456","orderedBookName":"The Rainbow"} 
     ```
 
-### <a name="unit-testing"></a> Writing Unit Tests 
+### <a name="unit-testing"></a> Writing unit tests 
 
 In ballerina, the unit test cases should be in the same package and the naming convention should be as follows,
 * Test files should contain _test.bal suffix.
@@ -292,7 +292,7 @@ To check the implementations of these test files, please go to https://github.co
 
 Once you are done with the development, you can deploy the service using any of the methods that we listed below. 
 
-### <a name="deploying-on-locally"></a> Deploying Locally
+### <a name="deploying-on-locally"></a> Deploying locally
 You can deploy the RESTful service that you developed above, in your local environment. You can create the Ballerina executable archive (.balx) first and then run it in your local environment as follows,
 
 Building 
@@ -332,7 +332,7 @@ For example,
 
 To run the Bookstore service, which acts as the JMS message producer run the following command,
 
-```
+```bash
 docker run -p <host_port>:9090 --name ballerina_Bookstore -d jmsProducer:latest
 ``` 
 
