@@ -329,3 +329,8 @@ Running
 
 ### <a name="tracing"></a> Tracing 
 (Work in progress) 
+
+
+## P.S.
+
+Due to an [issue](https://github.com/wso2-ballerina/package-jms/issues/49), Ballerina JMS Connector does not work with Ballerina versions later 0.96.0 (exclusive). Therefore, when trying this guide use Ballerina version 0.96.0.
