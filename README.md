@@ -28,7 +28,7 @@ Producer.
 - A Text Editor or an IDE 
 
 Optional Requirements
-- Ballerina IDE plugins. ( IntelliJ IDEA, VSCode, Atom)
+- Ballerina IDE plugins (IntelliJ IDEA, VSCode, Atom)
 
 ## <a name="developing-service"></a> Developing the Service
 
