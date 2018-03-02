@@ -312,7 +312,29 @@ Running
    ```
 
 ### <a name="deploying-on-docker"></a> Deploying on Docker
-(Work in progress) 
+
+You can use the Ballerina executable archives (.balx) that we created above and create docker images for the services using the following commands,
+
+```bash
+<SAMPLE_ROOT_DIRECTORY>$ ballerina docker jmsConsumer.balx  
+
+<SAMPLE_ROOT_DIRECTORY>$ ballerina docker jmsProducer.balx  
+
+```
+
+Once you have created the docker images, you can run them using docker run as follows, 
+
+```bash
+docker run -p <host_port>:<service_port> --name <container_instance_name> -d <image_name>:<tag_name>
+```
+
+For example,
+
+To run the Bookstore service, which acts as the JMS message producer run the following command,
+
+```
+docker run -p <host_port>:9090 --name ballerina_Bookstore -d jmsProducer:latest
+``` 
 
 ### <a name="deploying-on-k8s"></a> Deploying on Kubernetes
 (Work in progress) 
