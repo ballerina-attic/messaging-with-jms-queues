@@ -19,10 +19,10 @@ Producer.
 ## <a name="pre-req"></a> Prerequisites
  
 - JDK 1.8 or later
-- Ballerina Distribution (Install Instructions:  https://ballerinalang.org/docs/quick-tour/quick-tour/#install-ballerina)
-- Ballerina JMS Connector (Download: https://github.com/ballerinalang/connector-jms/releases)
+- [Ballerina Distribution](https://ballerinalang.org/docs/quick-tour/quick-tour/#install-ballerina)
+- [Ballerina JMS Connector](https://github.com/ballerinalang/connector-jms/releases)
   * After downloading the zip file, extract it and copy the containing jars into <BALLERINA_HOME>/bre/lib folder
-- A JMS Broker (Example: Apache ActiveMQ - Refer: http://activemq.apache.org/getting-started.html)
+- A JMS Broker (Example: [Apache ActiveMQ](http://activemq.apache.org/getting-started.html))
   * After downloading and installing, copy the JMS Broker Client jars into <BALLERINA_HOME>/bre/lib folder
     * For ActiveMQ 5.12.0 - activemq-client-5.12.0.jar, geronimo-j2ee-management_1.1_spec-1.0.1.jar
 - A Text Editor or an IDE 
