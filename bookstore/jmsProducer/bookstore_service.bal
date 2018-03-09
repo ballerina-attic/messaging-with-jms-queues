@@ -35,25 +35,31 @@ json[] bookInventory = ["Tom Jones", "The Rainbow", "Lolita", "Atonement", "Haml
 @http:configuration {basePath:"/bookStore"}
 service<http> bookstoreService {
     // Resource that allows users to place an order for a book
-    @http:resourceConfig {methods:["POST"]}
+    @http:resourceConfig {methods:["POST"], consumes:["application/json"], produces:["application/json"]}
     resource placeOrder (http:Connection httpConnection, http:InRequest request) {
         http:OutResponse response = {};
         order bookOrder = {};
 
         // Try getting the JSON payload from the user request
-        try {
-            json reqPayload = request.getJsonPayload();
-            bookOrder.customerName = reqPayload["Name"].toString();
-            bookOrder.address = reqPayload["Address"].toString();
-            bookOrder.contactNumber = reqPayload["ContactNumber"].toString();
-            bookOrder.orderedBookName = reqPayload["BookName"].toString().trim();
-        } catch (error err) {
-            // If payload parsing fails, send a "Bad Request" message as the response
+        json reqPayload = request.getJsonPayload();
+        json name = reqPayload.Name;
+        json address = reqPayload.Address;
+        json contact = reqPayload.ContactNumber;
+        json bookName = reqPayload.BookName;
+
+        // If payload parsing fails, send a "Bad Request" message as the response
+        if (name == null || address == null || contact == null || bookName == null) {
             response.statusCode = 400;
-            response.setJsonPayload({"Message":"Bad Request: Invalid payload"});
+            response.setJsonPayload({"Message":"Bad Request - Invalid payload"});
             _ = httpConnection.respond(response);
             return;
         }
+
+        // Order details
+        bookOrder.customerName = name.toString();
+        bookOrder.address = address.toString();
+        bookOrder.contactNumber = contact.toString();
+        bookOrder.orderedBookName = bookName.toString().trim();
 
         // boolean variable to track the availability of a requested book
         boolean isBookAvailable;
@@ -93,7 +99,7 @@ service<http> bookstoreService {
     }
 
     // Resource that allows users to get a list of all the available books
-    @http:resourceConfig {methods:["GET"]}
+    @http:resourceConfig {methods:["GET"], produces:["application/json"]}
     resource getAvailableBooks (http:Connection httpConnection, http:InRequest request) {
         http:OutResponse response = {};
         // Send json array 'bookInventory' as the response, which contains all the available books
