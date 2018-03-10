@@ -85,7 +85,7 @@ queue.TestQueue = TestQueue
 
 ```
 
-The above segment contains the `jndi.properties` file used in this sample. This file contains the details to manage connections for JMS. For this point-to-point example, you need to register the `connectionfactory.[jndiname]` and `queue.[jndiName]`. 
+The above segment contains the `jndi.properties` file used in this guide. This file contains the details to manage connections for JMS. For this point-to-point example, you need to register the `connectionfactory.[jndiname]` and `queue.[jndiName]`. 
 
 ### <a name="Implementation"></a> Implementation
 
