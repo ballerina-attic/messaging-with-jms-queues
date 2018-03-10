@@ -213,8 +213,7 @@ service<http> bookstoreService {
 
 ```
 
-To see the complete implementation of file `bookstore_service.bal` refer
-https://github.com/ballerina-guides/messaging-with-jms-queues/blob/master/bookstore/jmsProducer/bookstore_service.bal.
+To see the complete implementation of the above, refer [bookstore_service.bal](https://github.com/ballerina-guides/messaging-with-jms-queues/blob/master/bookstore/jmsProducer/bookstore_service.bal).
 
 
 ## <a name="testing"></a> Testing 
@@ -278,7 +277,7 @@ In ballerina, the unit test cases should be in the same package and the naming c
 * Test functions should contain test prefix.
   * e.g.: testBookstoreService()
 
-This guide contains unit test cases for each method implemented in `jms_producer_utils.bal` and `bookstore_service.bal` files.
+This guide contains unit test cases for each method implemented in `bookstore_service.bal` and `jms_producer_utils.bal` files.
 Test files are in the same packages in which the above files are located.
 
 To run the unit tests, go to the sample root directory and run the following command
@@ -286,7 +285,7 @@ To run the unit tests, go to the sample root directory and run the following com
    <SAMPLE_ROOT_DIRECTORY>$ ballerina test bookstore/jmsProducer/
    ```
 
-To check the implementations of these test files, please go to https://github.com/ballerina-guides/messaging-with-jms-queues/blob/master/bookstore/jmsProducer/ and refer the respective folders of `jms_producer_utils.bal` and `bookstore_service.bal` files. 
+To check the implementations of these test files, refer [bookstore_service_test.bal](https://github.com/pranavan15/messaging-with-jms-queues/blob/master/bookstore/jmsProducer/bookstore_service_test.bal) and [jms_producer_utils_test.bal].(https://github.com/pranavan15/messaging-with-jms-queues/blob/master/bookstore/jmsProducer/jmsUtil/jms_producer_utils_test.bal).
 
 ## <a name="deploying-the-scenario"></a> Deployment
 
