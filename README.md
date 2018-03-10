@@ -192,7 +192,7 @@ struct order {
 @http:configuration {basePath:"/bookStore"}
 service<http> bookstoreService {
     // Resource that allows users to place an order for a book
-    @http:resourceConfig {methods:["POST"]}
+    @http:resourceConfig {methods:["POST"], consumes:["application/json"], produces:["application/json"]}
     resource placeOrder (http:Connection httpConnection, http:InRequest request) {
      
         // Try getting the JSON payload from the user request
