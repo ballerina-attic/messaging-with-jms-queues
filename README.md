@@ -1,10 +1,20 @@
 # Messaging with JMS Queues
 
-This guide walks you through the process of messaging with jms queues using a message broker in Ballerina language.
-Java Message Service (JMS) is used for sending messages between two or more clients. JMS support two models, point-to-point model and publish/subscribe model. This example is based on point-to-point model where messages are routed to an individual consumer which maintains a queue of "incoming" messages. This messaging type is built on the concept of message queues, senders, and receivers. Each message is addressed to a specific queue, and the receiving clients extract messages from the queues established to hold their messages. In point-to-point model each message is guaranteed to be delivered, and consumed by one consumer in an asynchronous manner.
+Java Message Service (JMS) is used to send messages between two or more clients. JMS supports two models: point-to-point model and publish/subscribe model. This guide is based on the point-to-point model where messages are routed to an individual consumer that maintains a queue of "incoming" messages. This messaging type is built on the concept of message queues, senders, and receivers. Each message is addressed to a specific queue, and the receiving clients extract messages from the queues established to hold their messages. In the point-to-point model, each message is guaranteed to be delivered and consumed by one consumer in an asynchronous manner.
+
+> This guide walks you through the process of using Ballerina to send messages with JMS queues using a message broker.
+
+The following are the sections available in this guide.
+
+- [What you'll build](#what-you-build)
+- [Prerequisites](#pre-req)
+- [Developing the RESTFul service with circuit breaker](#developing-service)
+- [Testing](#testing)
+- [Deployment](#deploying-the-scenario)
+- [Observability](#observability)
 
 ## <a name="what-you-build"></a>  What you’ll build
-To understanding how you can use JMS queues for messaging, let's consider a real-world use case of an online bookstore service using which a user can order books for home delivery. Once an order is placed, the service will add it to a JMS queue named "OrderQueue" if the order is valid. Hence, this bookstore service acts as the JMS message producer. An order delivery system, which acts as the JMS message consumer polls the "OrderQueue" and gets the order details whenever the queue becomes populated. The below diagram illustrates this use case clearly.
+To understand how you can use JMS queues for messaging, let's consider a real-world use case of an online bookstore service using which a user can order books for home delivery. Once an order is placed, the service will add it to a JMS queue named "OrderQueue" if the order is valid. Hence, this bookstore service acts as the JMS message producer. An order delivery system, which acts as the JMS message consumer polls the "OrderQueue" and gets the order details whenever the queue becomes populated. The below diagram illustrates this use case clearly.
 
 
 
@@ -188,7 +198,7 @@ struct order {
    // Implementation
 }
 
-// Book store service, which allows users to order books online for delivery
+// Book store service that allows users to order books online for delivery
 @http:configuration {basePath:"/bookStore"}
 service<http> bookstoreService {
     // Resource that allows users to place an order for a book
@@ -197,11 +207,11 @@ service<http> bookstoreService {
      
         // Try getting the JSON payload from the user request
   
-        // Check whether the requested book available
+        // Check whether the requested book is available
       
-        // If requested book is available then try adding the order to the JMS queue 'OrderQueue'
+        // If the requested book is available, try adding the order to the JMS queue 'OrderQueue'
         
-        // Send appropriate JSON response
+        // Send an appropriate JSON response
     }
 
     // Resource that allows users to get a list of all the available books
@@ -213,21 +223,21 @@ service<http> bookstoreService {
 
 ```
 
-To see the complete implementation of file `bookstore_service.bal` refer
-https://github.com/ballerina-guides/messaging-with-jms-queues/blob/master/bookstore/jmsProducer/bookstore_service.bal.
+To see the complete implementation of the `bookstore_service.bal` file, refer to
+[https://github.com/ballerina-guides/messaging-with-jms-queues/blob/master/bookstore/jmsProducer/bookstore_service.bal](https://github.com/ballerina-guides/messaging-with-jms-queues/blob/master/bookstore/jmsProducer/bookstore_service.bal).
 
 
 ## <a name="testing"></a> Testing 
 
 ### <a name="try-it"></a> Try it out
 
-1. Start `Apache ActiveMQ` server by entering the following command in a terminal
+1. Start `Apache ActiveMQ` server by entering the following command in a terminal.
 
    ```bash
    <ActiveMQ_BIN_DIRECTORY>$ ./activemq start
    ```
 
-2. Run both the http service `bookstoreService`, which acts as the JMS producer and JMS service `orderDeliverySystem`, which acts as the JMS consumer by entering the following commands in sperate terminals
+2. Run both the HTTP service `bookstoreService`, which acts as the JMS producer, and the JMS service `orderDeliverySystem`, which acts as the JMS consumer, by entering the following commands in sperate terminals.
 
     ```bash
     <SAMPLE_ROOT_DIRECTORY>$ ballerina run bookstore/jmsProducer/
@@ -237,19 +247,19 @@ https://github.com/ballerina-guides/messaging-with-jms-queues/blob/master/bookst
     <SAMPLE_ROOT_DIRECTORY>$ ballerina run bookstore/jmsConsumer/
     ```
    
-3. Invoke the `bookstoreService` by sending a GET request to check all the available books
+3. Invoke the `bookstoreService` by sending a GET request to check all the available books.
 
     ```bash
     curl -v -X GET localhost:9090/bookstore/getAvailableBooks
     ```
 
-     The bookstoreService should respond something similar,
+     The bookstoreService sends a response similar to the following.
      ```
     < HTTP/1.1 200 OK
     ["Tom Jones","The Rainbow","Lolita","Atonement","Hamlet"]
      ```
    
-4. To place an order,
+4. Place an order using the following command.
 
     ```bash
     curl -v -X POST -d \
@@ -257,13 +267,13 @@ https://github.com/ballerina-guides/messaging-with-jms-queues/blob/master/bookst
      "http://localhost:9090/bookstore/placeOrder" -H "Content-Type:application/json"
     ```
 
-    The bookstoreService should respond something similar,
+    The bookstoreService sends a response similar to the following.
     ```
      < HTTP/1.1 200 OK
     {"Message":"Your order is successfully placed. Ordered book will be delivered soon"}
     ```
 
-    Sample Log Messages
+    Sample Log Messages:
     ```bash
     2018-02-23 21:22:21,268 INFO  [bookstore.jmsProducer] - New order added to the JMS Queue; CustomerName: 'Bob', OrderedBook: 'The Rainbow'; 
 
@@ -273,27 +283,27 @@ https://github.com/ballerina-guides/messaging-with-jms-queues/blob/master/bookst
 
 ### <a name="unit-testing"></a> Writing unit tests 
 
-In ballerina, the unit test cases should be in the same package and the naming convention should be as follows,
+In Ballerina, the unit test cases are in the same package and the naming convention should be as follows.
 * Test files should contain _test.bal suffix.
 * Test functions should contain test prefix.
-  * e.g.: testBookstoreService()
+  * e.g., testBookstoreService()
 
-This guide contains unit test cases for each method implemented in `jms_producer_utils.bal` and `bookstore_service.bal` files.
+This guide contains unit test cases for each method implemented in the `jms_producer_utils.bal` and `bookstore_service.bal` files.
 Test files are in the same packages in which the above files are located.
 
-To run the unit tests, go to the sample root directory and run the following command
+To run the unit tests, go to the sample root directory and run the following command.
    ```bash
    <SAMPLE_ROOT_DIRECTORY>$ ballerina test bookstore/jmsProducer/
    ```
 
-To check the implementations of these test files, please go to https://github.com/ballerina-guides/messaging-with-jms-queues/blob/master/bookstore/jmsProducer/ and refer the respective folders of `jms_producer_utils.bal` and `bookstore_service.bal` files. 
+To check the implementations of these test files, please go to [https://github.com/ballerina-guides/messaging-with-jms-queues/blob/master/bookstore/jmsProducer/](https://github.com/ballerina-guides/messaging-with-jms-queues/blob/master/bookstore/jmsProducer/) and refer to the respective folders of the `jms_producer_utils.bal` and `bookstore_service.bal` files. 
 
 ## <a name="deploying-the-scenario"></a> Deployment
 
 Once you are done with the development, you can deploy the service using any of the methods that we listed below. 
 
 ### <a name="deploying-on-locally"></a> Deploying locally
-You can deploy the RESTful service that you developed above, in your local environment. You can create the Ballerina executable archive (.balx) first and then run it in your local environment as follows,
+You can deploy the RESTful service that you developed above in your local environment. You can create the Ballerina executable archive (.balx) first and then run it in your local environment as follows.
 
 Building 
    ```bash
