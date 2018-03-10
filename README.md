@@ -8,7 +8,7 @@ To understanding how you can use JMS queues for messaging, let's consider a real
 
 
 
-![alt text](https://github.com/pranavan15/messaging-with-jms-queues/blob/master/images/JMS_queue.png)
+![alt text](/images/JMS_queue.png)
 
 
 
