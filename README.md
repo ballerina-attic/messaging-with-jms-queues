@@ -285,7 +285,7 @@ To run the unit tests, go to the sample root directory and run the following com
    <SAMPLE_ROOT_DIRECTORY>$ ballerina test bookstore/jmsProducer/
    ```
 
-To check the implementations of these test files, refer [bookstore_service_test.bal](https://github.com/pranavan15/messaging-with-jms-queues/blob/master/bookstore/jmsProducer/bookstore_service_test.bal) and [jms_producer_utils_test.bal].(https://github.com/pranavan15/messaging-with-jms-queues/blob/master/bookstore/jmsProducer/jmsUtil/jms_producer_utils_test.bal).
+To check the implementations of these test files, refer [bookstore_service_test.bal](https://github.com/pranavan15/messaging-with-jms-queues/blob/master/bookstore/jmsProducer/bookstore_service_test.bal) and [jms_producer_utils_test.bal](https://github.com/pranavan15/messaging-with-jms-queues/blob/master/bookstore/jmsProducer/jmsUtil/jms_producer_utils_test.bal).
 
 ## <a name="deploying-the-scenario"></a> Deployment
 
