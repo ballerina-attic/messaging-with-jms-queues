@@ -29,22 +29,23 @@ Producer.
 ## <a name="pre-req"></a> Prerequisites
  
 - JDK 1.8 or later
-- [Ballerina Distribution](https://ballerinalang.org/docs/quick-tour/quick-tour/#install-ballerina)
+- [Ballerina Distribution](https://github.com/ballerina-lang/ballerina/blob/master/docs/quick-tour.md)
 - [Ballerina JMS Connector](https://github.com/ballerinalang/connector-jms/releases)
-  * After downloading the zip file, extract it and copy the containing jars into <BALLERINA_HOME>/bre/lib folder
+  * After downloading the ZIP file, extract it and copy the containing .jar files into the <BALLERINA_HOME>/bre/lib folder.
 - A JMS Broker (Example: [Apache ActiveMQ](http://activemq.apache.org/getting-started.html))
-  * After downloading and installing, copy the JMS Broker Client jars into <BALLERINA_HOME>/bre/lib folder
+  * After downloading and installing, copy the JMS Broker Client .jar files into the <BALLERINA_HOME>/bre/lib folder.
     * For ActiveMQ 5.12.0 - activemq-client-5.12.0.jar, geronimo-j2ee-management_1.1_spec-1.0.1.jar
 - A Text Editor or an IDE 
 
-Optional Requirements
-- Ballerina IDE plugins (IntelliJ IDEA, VSCode, Atom)
+### Optional Requirements
+- Ballerina IDE plugins ([IntelliJ IDEA](https://plugins.jetbrains.com/plugin/9520-ballerina), [VSCode](https://marketplace.visualstudio.com/items?itemName=WSO2.Ballerina), [Atom](https://atom.io/packages/language-ballerina))
+- [Docker](https://docs.docker.com/engine/installation/)
 
 ## <a name="developing-service"></a> Developing the service
 
 ### <a name="before-begin"></a> Before you begin
 ##### Understand the package structure
-Ballerina is a complete programming language that can have any custom project structure as you wish. Although language allows you to have any package structure, we'll stick with the following package structure for this project.
+Ballerina is a complete programming language that can have any custom project structure that you wish. Although the language allows you to have any package structure, use the following package structure for this project to follow this guide.
 
 ```
 messaging-with-jms-queues
@@ -63,11 +64,11 @@ messaging-with-jms-queues
 
 ```
 
-The `jmsConsumer` package contains file that handles the logic of message consumption from the JMS queue.
+The `jmsConsumer` package contains the file that handles the logic of message consumption from the JMS queue.
 
 The `jmsProducer` package contains files that handle the JMS message producing logic and test files. 
 
-The `resources` package contains `jndi.properties` file, which manages connections for JMS.
+The `resources` package contains a `jndi.properties` file that manages connections for JMS.
 
 ##### Understand the `jndi.properties` file
 
@@ -84,12 +85,11 @@ queue.TestQueue = TestQueue
 
 ```
 
-The above segment contains the `jndi.properties` file used in this sample. This file contains the details to manage connections for JMS. For this point-to-point example, we require to register the `connectionfactory.[jndiname]` and 
-`queue.[jndiName]`. 
+The above segment contains the `jndi.properties` file used in this sample. This file contains the details to manage connections for JMS. For this point-to-point example, you need to register the `connectionfactory.[jndiname]` and `queue.[jndiName]`. 
 
 ### <a name="Implementation"></a> Implementation
 
-Let's get started with the implementation of `jms_producer_utils.bal`file, which contains the JMS configurations required by the message producer. Refer the code attached below. Inline comments are added for better understanding.
+Let's get started with the implementation of `jms_producer_utils.bal`file, which contains the JMS configurations required by the message producer. Refer to the code attached below. Inline comments are added for better understanding.
 
 ##### jms_producer_utils.bal
 ```ballerina
@@ -126,7 +126,7 @@ public function addToJmsQueue (string queueName, string message) (error jmsError
 function getConnectorConfig () (jms:ClientProperties properties) {
     // JMS client properties
     // 'providerUrl' or 'configFilePath', and the 'initialContextFactory' vary according to the JMS provider you use
-    // 'Apache ActiveMQ' has been used as the message broker in this example
+    // 'Apache ActiveMQ' is used as the message broker in this guide
     properties = {initialContextFactory:"org.apache.activemq.jndi.ActiveMQInitialContextFactory",
                      providerUrl:"tcp://localhost:61616",
                      connectionFactoryName:"QueueConnectionFactory",
@@ -136,15 +136,16 @@ function getConnectorConfig () (jms:ClientProperties properties) {
 
 ```
 
-In the above implementation, private function `getConnectorConfig()` is used to get the JMS client connector configurations.
-This function returns `jms:ClientProperties` required by the JMS client. Fields `initialContextFactory`, `providerUrl`, `connectionFactoryName` and `connectionFactoryType` determine the properties needed for the JMS client. Instead of `providerUrl` you could also provide `configFilePath`, which will be the file path of your `jndi.properties` file.
+In the above implementation, private function `getConnectorConfig()` is used to get the JMS client connector configurations. This function returns `jms:ClientProperties` required by the JMS client. 
+
+The `initialContextFactory`, `providerUrl`, `connectionFactoryName` and `connectionFactoryType` fields determine the properties needed for the JMS client. Instead of `providerUrl` you could also use `configFilePath`, which will be the file path of your `jndi.properties` file.
+
 Change the `providerUrl` and the `initialContextFactory` according to the JMS provider you use. 
 
 Function `addToJmsQueue()` takes a message and a queue name as parameters and tries to add the message to the queue specified. It gets the JMS client configuration details by calling the method `getConnectorConfig()`. Function `addToJmsQueue()` returns an error if it fails to obtain the JMS client.
 
-
 Let's next focus on the implementation of `order_delivery_system.bal` file, which consists of the message consuming logic.
-Consider the below code. Inline comments are added for better understanding.
+Refer to the following code. Inline comments are added for better understanding.
 
 ##### order_delivery_system.bal
 ```ballerina
@@ -157,7 +158,7 @@ import ballerina.net.jms;
                       Connection factory type can be either queue or topic depending on the requirement."}
 
 // JMS Configurations
-// 'Apache ActiveMQ' has been used as the message broker
+// 'Apache ActiveMQ' is used as the message broker
 @jms:configuration {
     initialContextFactory:"org.apache.activemq.jndi.ActiveMQInitialContextFactory",
     providerUrl:
@@ -169,10 +170,10 @@ import ballerina.net.jms;
 
 // JMS service that consumes messages from the JMS queue
 service<jms> orderDeliverySystem {
-    // Triggered whenever an order is added to the 'OrderQueue'
+    // This is triggered whenever an order is added to the 'OrderQueue'
     resource onMessage (jms:JMSMessage message) {
         log:printInfo("New order received from the JMS Queue");
-        // Retrieve the string payload using native function
+        // Retrieve the string payload using a native function
         string stringPayload = message.getTextMessageContent();
         log:printInfo("Order Details: " + stringPayload);
     }
@@ -180,15 +181,17 @@ service<jms> orderDeliverySystem {
 
 ```
 
-`orderDeliverySystem` is a JMS service, which acts as the JMS message receiver. We require to provide the JMS configuration details for this JMS service. `@jms:configuration {}` block contains these configurations. Except `destination` other fields are similar to what we had in the `getConnectorConfig()`. Field `destination` is used to specify the JMS queue name from which the consumer needs to consume messages. This should be the same name you specified for `[physicalName]` in line 
-`queue.[jndiName] = [physicalName]` in the `jndi.properties` file.
+`orderDeliverySystem` is a JMS service that acts as the JMS message receiver. You need to provide the JMS configuration details for this JMS service. The `@jms:configuration {}` block contains these configurations. Except for `destination`, the other fields are similar to what you see in the `getConnectorConfig()`. 
+
+The `destination` field is used to specify the JMS queue name from which the consumer needs to consume messages. This should be the same name you specified for `[physicalName]` in line `queue.[jndiName] = [physicalName]` in the `jndi.properties` file.
 
 Resource `onMessage` will be triggered whenever the queue specified as the destination gets populated. 
 
+Finally, let's focus on the implementation of `bookstore_service.bal` file, which contains the service logic for the online bookstore service use-case considered in this guide. This service has two resourses, namely `getAvailableBooks` and `placeOrder`.
 
-Finally, let's focus on the implementation of `bookstore_service.bal` file, which contains the service logic for the online bookstore service use-case we considered. This service has two resourses namely `getAvailableBooks` and `placeOrder`.
-Resource `getAvailableBooks` can be consumed by a user to get a list of all the available books through a GET request. User will get a JSON response with the names of all the available books.
-Resource `placeOrder` can be consumed by a user to place an order for a book delivery. User needs to send a POST request with an appropriate JSON payload to the service. Service will then check for the availability of the book and send a JSON response to the user. If the book is available then the order will be added to the JMS queue `OrderQueue`, which will be consumed by the order delivery system later. Skeleton of the `bookstore_service.bal` is attached below.
+Resource `getAvailableBooks` can be consumed by a user to get a list of all the available books through a GET request. The user receives a JSON response with the names of all the available books.
+
+Resource `placeOrder` can be consumed by a user to place an order for a book delivery. The user needs to send a POST request with an appropriate JSON payload to the service. Service will then check for the availability of the book and send a JSON response to the user. If the book is available then the order will be added to the JMS queue `OrderQueue`, which will be consumed by the order delivery system later. Skeleton of the `bookstore_service.bal` is attached below.
 
 ##### bookstore_service.bal
 ```ballerina
