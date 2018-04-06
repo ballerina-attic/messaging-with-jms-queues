@@ -1,6 +1,4 @@
-[![Build Status](https://travis-ci.org/pranavan15/messaging-with-jms-queues.svg?branch=master)](https://travis-ci.org/pranavan15/messaging-with-jms-queues)
-
-# Messaging with JMS Queues
+# Messaging with JMS
 
 Java Message Service (JMS) is used to send messages between two or more clients. JMS supports two models: point-to-point model and publish/subscribe model. This guide is based on the point-to-point model where messages are routed to an individual consumer that maintains a queue of "incoming" messages. This messaging type is built on the concept of message queues, senders, and receivers. Each message is addressed to a specific queue, and the receiving clients extract messages from the queues established to hold their messages. In the point-to-point model, each message is guaranteed to be delivered and consumed by one consumer in an asynchronous manner.
 
