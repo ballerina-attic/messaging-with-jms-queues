@@ -18,7 +18,7 @@ To understand how you can use JMS queues for messaging, let's consider a real-wo
 
 
 
-![alt text](/images/JMS_queue.png)
+![alt text](/images/messaging-with-jms-queues.svg)
 
 
 
