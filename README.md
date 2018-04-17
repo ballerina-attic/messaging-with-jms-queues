@@ -243,8 +243,8 @@ To see the complete implementation of the above, refer to the [bookstore_service
 
   Sample Log Messages:
 ```bash
-    INFO  [bookstore.jmsProducer] - New order added to the JMS Queue;
-      CustomerName: 'Bob', OrderedBook: 'The Rainbow'; 
+    INFO  [bookstore.jmsProducer] - New order added to the JMS Queue; CustomerName: 'Bob',
+    OrderedBook: 'The Rainbow'; 
 
     INFO  [bookstore.jmsConsumer] - New order received from the JMS Queue 
     INFO  [bookstore.jmsConsumer] - Order Details: {"customerName":"Bob","address":"20, Palm Grove,
