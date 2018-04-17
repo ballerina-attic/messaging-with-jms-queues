@@ -188,65 +188,66 @@ service<http:Service> bookstoreService bind listener {
       // Send a JSON response with all the available books  
     }
 }
-
 ```
 
-To see the complete implementation of the above, refer to the [bookstore_service.bal](https://github.com/ballerina-guides/messaging-with-jms-queues/blob/master/bookstore/jmsProducer/bookstore_service.bal).
+Similar to the JMS consumer, here also we require to provide JMS configuration details when defining the `jms:QueueSender` endpoint. We need to provide the JMS session and the queue to which the producer pushes the messages.   
 
+To see the complete implementation of the above, refer to the [bookstore_service.bal](https://github.com/ballerina-guides/messaging-with-jms-queues/blob/master/src/bookstore_service/bookstore_service.bal).
 
 ## Testing 
 
 ### Try it out
 
-1. Start `Apache ActiveMQ` server by entering the following command in a terminal.
+- Start `Apache ActiveMQ` server by entering the following command in a terminal.
 
-   ```bash
+```bash
    <ActiveMQ_BIN_DIRECTORY>$ ./activemq start
-   ```
+```
 
-2. Run both the HTTP service `bookstoreService`, which acts as the JMS producer, and the JMS service `orderDeliverySystem`, which acts as the JMS consumer, by entering the following commands in sperate terminals.
+- Run both the HTTP service `bookstoreService`, which acts as the JMS producer, and the JMS service `orderDeliverySystem`, which acts as the JMS consumer, by entering the following commands in sperate terminals.
 
-    ```bash
-    <SAMPLE_ROOT_DIRECTORY>$ ballerina run bookstore/jmsProducer/
-   ```
+```bash
+   <SAMPLE_ROOT_DIRECTORY>$ ballerina run bookstore/jmsProducer/
+```
 
-    ```bash
-    <SAMPLE_ROOT_DIRECTORY>$ ballerina run bookstore/jmsConsumer/
-    ```
+```bash
+   <SAMPLE_ROOT_DIRECTORY>$ ballerina run bookstore/jmsConsumer/
+```
    
-3. Invoke the `bookstoreService` by sending a GET request to check all the available books.
+- Invoke the `bookstoreService` by sending a GET request to check all the available books.
 
-    ```bash
-    curl -v -X GET localhost:9090/bookstore/getAvailableBooks
-    ```
+```bash
+   curl -v -X GET localhost:9090/bookstore/getAvailableBooks
+```
 
-     The bookstoreService sends a response similar to the following.
-     ```
-    < HTTP/1.1 200 OK
-    ["Tom Jones","The Rainbow","Lolita","Atonement","Hamlet"]
-     ```
+   The bookstoreService sends a response similar to the following.
+```
+   < HTTP/1.1 200 OK
+   ["Tom Jones","The Rainbow","Lolita","Atonement","Hamlet"]
+```
    
-4. Place an order using the following command.
+- Place an order using the following command.
 
-    ```bash
-    curl -v -X POST -d \
-    '{"Name":"Bob", "Address":"20, Palm Grove, Colombo, Sri Lanka", "ContactNumber":"+94777123456", "BookName":"The Rainbow"}' \
-     "http://localhost:9090/bookstore/placeOrder" -H "Content-Type:application/json"
-    ```
+```bash
+   curl -v -X POST -d \
+   '{"Name":"Bob", "Address":"20, Palm Grove, Colombo, Sri Lanka", "ContactNumber":"+94777123456",
+     "BookName":"The Rainbow"}' \
+   "http://localhost:9090/bookstore/placeOrder" -H "Content-Type:application/json"
+```
 
-    The bookstoreService sends a response similar to the following.
-    ```
-     < HTTP/1.1 200 OK
-    {"Message":"Your order is successfully placed. Ordered book will be delivered soon"}
-    ```
+  The bookstoreService sends a response similar to the following.
+```
+   < HTTP/1.1 200 OK
+   {"Message":"Your order is successfully placed. Ordered book will be delivered soon"}
+```
 
-    Sample Log Messages:
-    ```bash
-    2018-02-23 21:22:21,268 INFO  [bookstore.jmsProducer] - New order added to the JMS Queue; CustomerName: 'Bob', OrderedBook: 'The Rainbow'; 
+  Sample Log Messages:
+```bash
+    INFO  [bookstore.jmsProducer] - New order added to the JMS Queue; CustomerName: 'Bob', OrderedBook: 'The Rainbow'; 
 
-    2018-02-23 21:22:24,181 INFO  [bookstore.jmsConsumer] - New order received from the JMS Queue 
-    2018-02-23 21:22:24,184 INFO  [bookstore.jmsConsumer] - Order Details: {"customerName":"Bob","address":"20, Palm Grove, Colombo, Sri Lanka","contactNumber":"+94777123456","orderedBookName":"The Rainbow"} 
-    ```
+    INFO  [bookstore.jmsConsumer] - New order received from the JMS Queue 
+    INFO  [bookstore.jmsConsumer] - Order Details: {"customerName":"Bob","address":"20, Palm Grove, Colombo, Sri Lanka","contactNumber":"+94777123456","orderedBookName":"The Rainbow"} 
+```
 
 ### Writing unit tests 
 
@@ -259,9 +260,9 @@ This guide contains unit test cases for each method implemented in the `bookstor
 Test files are in the same packages in which the above files are located.
 
 To run the unit tests, go to the sample root directory and run the following command.
-   ```bash
+```bash
    <SAMPLE_ROOT_DIRECTORY>$ ballerina test bookstore/jmsProducer/
-   ```
+```
 
 To check the implementations of these test files, refer to the [bookstore_service_test.bal](https://github.com/ballerina-guides/messaging-with-jms-queues/blob/master/bookstore/jmsProducer/bookstore_service_test.bal) and [jms_producer_utils_test.bal](https://github.com/ballerina-guides/messaging-with-jms-queues/blob/master/bookstore/jmsProducer/jmsUtil/jms_producer_utils_test.bal).
 
@@ -273,23 +274,15 @@ Once you are done with the development, you can deploy the service using any of 
 You can deploy the RESTful service that you developed above in your local environment. You can create the Ballerina executable archive (.balx) first and then run it in your local environment as follows.
 
 Building 
-   ```bash
-    <SAMPLE_ROOT_DIRECTORY>$ ballerina build bookstore/jmsConsumer/
+```bash
+   <SAMPLE_ROOT_DIRECTORY>$ ballerina build bookstore/jmsConsumer/
 
-    <SAMPLE_ROOT_DIRECTORY>$ ballerina build bookstore/jmsProducer/
-
-   ```
+   <SAMPLE_ROOT_DIRECTORY>$ ballerina build bookstore/jmsProducer/
+```
 
 Running
-   ```bash
-    <SAMPLE_ROOT_DIRECTORY>$ ballerina run jmsConsumer.balx 
+```bash
+   <SAMPLE_ROOT_DIRECTORY>$ ballerina run jmsConsumer.balx 
 
-    <SAMPLE_ROOT_DIRECTORY>$ ballerina run jmsProducer.balx 
-
-   ```
-
-### Deploying on Docker
-(Work in progress) 
-
-### Deploying on Kubernetes
-(Work in progress) 
+   <SAMPLE_ROOT_DIRECTORY>$ ballerina run jmsProducer.balx 
+```
