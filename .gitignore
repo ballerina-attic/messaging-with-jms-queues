@@ -33,3 +33,5 @@ target
 
 # mac
 .DS_Store
+.ballerina/
+target/

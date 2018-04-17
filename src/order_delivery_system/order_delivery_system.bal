@@ -17,28 +17,35 @@
 package order_delivery_system;
 
 import ballerina/log;
-import ballerina/net.jms;
+import ballerina/jms;
 
-@Description {value:"Service level annotation to provide connection details.
-                      Connection factory type can be either queue or topic depending on the requirement."}
-
-// JMS Configurations
+// Initialize a JMS connection with the provider
 // 'Apache ActiveMQ' has been used as the message broker
-endpoint jms:ConsumerEndpoint jmsConsumerEP {
-    initialContextFactory:"org.apache.activemq.jndi.ActiveMQInitialContextFactory",
-    providerUrl:"tcp://localhost:61616"
+jms:Connection conn = new({
+        initialContextFactory:"org.apache.activemq.jndi.ActiveMQInitialContextFactory",
+        providerUrl:"tcp://localhost:61616"
+    });
+
+// Initialize a JMS session on top of the created connection
+jms:Session jmsSession = new(conn, {
+        // Optional property. Defaults to AUTO_ACKNOWLEDGE
+        acknowledgementMode:"AUTO_ACKNOWLEDGE"
+    });
+
+// Initialize a queue receiver using the created session
+endpoint jms:QueueReceiver jmsConsumer {
+    session:jmsSession,
+    queueName:"OrderQueue"
 };
 
-@jms:ServiceConfig {
-    destination:"OrderQueue"
-}
 // JMS service that consumes messages from the JMS queue
-service<jms:Service> orderDeliverySystem bind jmsConsumerEP {
-    // Triggered whenever an order is added to the 'OrderQueue'
-    onMessage (endpoint client, jms:Message message) {
+// Bind the created consumer to the listener service
+service<jms:Consumer> orderDeliverySystem bind jmsConsumer {
+// Triggered whenever an order is added to the 'OrderQueue'
+    onMessage(endpoint consumer, jms:Message message) {
         log:printInfo("New order received from the JMS Queue");
         // Retrieve the string payload using native function
-        string stringPayload = message.getTextMessageContent();
+        string stringPayload = check message.getTextMessageContent();
         log:printInfo("Order Details: " + stringPayload);
     }
 }
