@@ -108,7 +108,7 @@ service<http:Service> bookstoreService bind listener {
         }
 
         json responseMessage;
-        // If requested book is available then try adding the order to the JMS queue 'OrderQueue'
+        // If requested book is available then add the order to the JMS queue 'OrderQueue'
         if (isBookAvailable) {
             var bookOrderDetails = check <json>newOrder;
             // Create a JMS message
