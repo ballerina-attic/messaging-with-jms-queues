@@ -14,8 +14,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package bookstore_service;
-
 import ballerina/log;
 import ballerina/http;
 import ballerina/jms;
@@ -92,16 +90,16 @@ service<http:Service> bookstoreService bind listener {
         }
 
         // Order details
-        newOrder.customerName = name.toString() but { () => "" };
-        newOrder.address = address.toString() but { () => "" };
-        newOrder.contactNumber = contact.toString() but { () => "" };
-        newOrder.orderedBookName = bookName.toString() but { () => "" };
+        newOrder.customerName = name.toString();
+        newOrder.address = address.toString();
+        newOrder.contactNumber = contact.toString();
+        newOrder.orderedBookName = bookName.toString();
 
         // boolean variable to track the availability of a requested book
         boolean isBookAvailable;
         // Check whether the requested book available
         foreach book in bookInventory {
-            if (newOrder.orderedBookName.equalsIgnoreCase(book.toString() but { () => "" })) {
+            if (newOrder.orderedBookName.equalsIgnoreCase(book.toString())) {
                 isBookAvailable = true;
                 break;
             }
@@ -112,7 +110,7 @@ service<http:Service> bookstoreService bind listener {
         if (isBookAvailable) {
             var bookOrderDetails = check <json>newOrder;
             // Create a JMS message
-            jms:Message queueMessage = check jmsSession.createTextMessage(bookOrderDetails.toString() but { () => "" });
+            jms:Message queueMessage = check jmsSession.createTextMessage(bookOrderDetails.toString());
             // Send the message to the JMS queue
             _ = jmsProducer -> send(queueMessage);
             // Construct a success message for the response

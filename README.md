@@ -48,7 +48,7 @@ Ballerina is a complete programming language that can have any custom project st
 
 ```
 messaging-with-jms-queues
- └── src
+ └── guide
      ├── bookstore_service
      │   ├── bookstore_service.bal
      │   └── tests
@@ -192,7 +192,7 @@ service<http:Service> bookstoreService bind listener {
 
 Similar to the JMS consumer, here also we require to provide JMS configuration details when defining the `jms:QueueSender` endpoint. We need to provide the JMS session and the queue to which the producer pushes the messages.   
 
-To see the complete implementation of the above, refer to the [bookstore_service.bal](https://github.com/ballerina-guides/messaging-with-jms-queues/blob/master/src/bookstore_service/bookstore_service.bal).
+To see the complete implementation of the above, refer to the [bookstore_service.bal](https://github.com/ballerina-guides/messaging-with-jms-queues/blob/master/guide/bookstore_service/bookstore_service.bal).
 
 ## Testing 
 
