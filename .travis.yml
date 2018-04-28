@@ -16,11 +16,15 @@ services:
   - activemq
 
 script:
-# Declare STRING variable
-- STRING="Downloading ballerina..."
+# Declare STRING variables
+- STRING="Downloading Ballerina..."
+- STRING1="Downloading ActiveMQ..."
 
 # Declare variable for Ballerina version
 - BALLERINA_VERSION="ballerina-platform-0.970.0"
+
+# Declare variable for ActiveMQ version
+- ACTIVEMQ_VERSION="apache-activemq-5.12.0"
 
 # Print STRING variable
 - echo $STRING
@@ -36,6 +40,21 @@ script:
 
 # Print Ballerina version
 - ballerina version
+
+# Print STRING1 variable
+- echo $STRING1
+
+# Download ActiveMQ
+- wget https://archive.apache.org/dist/activemq/5.12.0/$ACTIVEMQ_VERSION-bin.tar.gz
+
+# Untar the tar file
+- tar xvzf $ACTIVEMQ_VERSION-bin.tar.gz
+
+# Start ActiveMQ
+- ./$ACTIVEMQ_VERSION/bin/activemq start
+
+# Copy ActiveMQ jars into Ballerina lib folder
+- cp $ACTIVEMQ_VERSION/activemq-all-5.12.0.jar $BALLERINA_VERSION/bre/lib
 
 # Change the directory
 - cd guide/
