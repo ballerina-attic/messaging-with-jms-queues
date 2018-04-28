@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/pranavan15/messaging-with-jms-queues.svg?branch=master)](https://travis-ci.org/pranavan15/messaging-with-jms-queues)
+
 # Messaging with JMS
 
 Java Message Service (JMS) is used to send messages between two or more clients. JMS supports two models: point-to-point model and publish/subscribe model. This guide is based on the point-to-point model where messages are routed to an individual consumer that maintains a queue of "incoming" messages. This messaging type is built on the concept of message queues, senders, and receivers. Each message is addressed to a specific queue, and the receiving clients extract messages from the queues established to hold their messages. In the point-to-point model, each message is guaranteed to be delivered and consumed by one consumer in an asynchronous manner.
@@ -8,9 +10,10 @@ The following are the sections available in this guide.
 
 - [What you'll build](#what-youll-build)
 - [Prerequisites](#prerequisites)
-- [Developing the service](#developing-the-service)
+- [Implementation](#implementation)
 - [Testing](#testing)
 - [Deployment](#deployment)
+- [Observability](#observability)
 
 ## What you’ll build
 To understand how you can use JMS queues for messaging, let's consider a real-world use case of an online bookstore service using which a user can order books for home delivery. Once an order is placed, the service will add it to a JMS queue named "OrderQueue" if the order is valid. Hence, this bookstore service acts as the JMS message producer. An order delivery system, which acts as the JMS message consumer polls the "OrderQueue" and gets the order details whenever the queue becomes populated. The below diagram illustrates this use case clearly.
@@ -27,41 +30,43 @@ Producer.
 
 ## Prerequisites
  
-- JDK 1.8 or later
-- [Ballerina Distribution](https://github.com/ballerina-lang/ballerina/blob/master/docs/quick-tour.md)
-- [Ballerina JMS Connector](https://github.com/ballerinalang/connector-jms/releases)
-  * After downloading the ZIP file, extract it and copy the containing .jar files into the <BALLERINA_HOME>/bre/lib folder.
+- [Ballerina Distribution](https://ballerina.io/learn/getting-started/)
 - A JMS Broker (Example: [Apache ActiveMQ](http://activemq.apache.org/getting-started.html))
-  * After downloading and installing, copy the JMS Broker Client .jar files into the <BALLERINA_HOME>/bre/lib folder.
-    * For ActiveMQ 5.12.0 - activemq-client-5.12.0.jar, geronimo-j2ee-management_1.1_spec-1.0.1.jar
+  * After installing the JMS broker, copy its .jar files into the `<BALLERINA_HOME>/bre/lib` folder.
+    * For ActiveMQ 5.12.0: Copy `activemq-client-5.12.0.jar` and `geronimo-j2ee-management_1.1_spec-1.0.1.jar`
 - A Text Editor or an IDE 
 
 ### Optional Requirements
 - Ballerina IDE plugins ([IntelliJ IDEA](https://plugins.jetbrains.com/plugin/9520-ballerina), [VSCode](https://marketplace.visualstudio.com/items?itemName=WSO2.Ballerina), [Atom](https://atom.io/packages/language-ballerina))
 - [Docker](https://docs.docker.com/engine/installation/)
+- [Kubernetes](https://kubernetes.io/docs/setup/)
 
-## Developing the service
+## Implementation
 
-### Before you begin
-#### Understand the package structure
-Ballerina is a complete programming language that can have any custom project structure that you wish. Although the language allows you to have any package structure, use the following package structure for this project to follow this guide.
+> If you want to skip the basics, download the git repository and move directly to the [Testing](#testing) section.
 
+### Create the project structure
+
+Ballerina is a complete programming language that supports custom project structures. Use the following package structure for this guide.
 ```
 messaging-with-jms-queues
  └── guide
-     ├── bookstore_service
-     │   ├── bookstore_service.bal
-     │   └── tests
-     │       └── bookstore_service_test.bal
-     └── order_delivery_system
-         └── order_delivery_system.bal
+      ├── bookstore_service
+      │    ├── bookstore_service.bal
+      │    └── tests
+      │         └── bookstore_service_test.bal
+      └── order_delivery_system
+           └── order_delivery_system.bal
 ```
 
-The `bookstore_service` package contains the file that handle the JMS message producing logic and unit tests. 
+- Create the above directories in your local machine and also create empty `.bal` files.
 
-The `order_delivery_system` package contains the file that handles the logic of message consumption from the JMS queue.
+- Then open the terminal and navigate to `messaging-with-jms-queues/guide` and run Ballerina project initializing toolkit.
+```bash
+   $ ballerina init
+```
 
-### Implementation
+### Developing the service
 
 Let's get started with the implementation of `order_delivery_system.bal`, which acts as the JMS message consumer. Refer to the code attached below. Inline comments added for better understanding.
 
