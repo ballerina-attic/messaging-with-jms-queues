@@ -342,6 +342,11 @@ json[] bookInventory = ["Tom Jones", "The Rainbow", "Lolita", "Atonement", "Haml
     tag:"v1.0"
 }
 
+@docker:CopyFiles {
+    files:[{source:<path_to_JMS_broker_jars>,
+            target:"/ballerina/runtime/bre/lib"}]
+}
+
 @docker:Expose{}
 endpoint http:Listener listener {
     port:9090
@@ -350,6 +355,8 @@ endpoint http:Listener listener {
 @http:ServiceConfig {basePath:"/bookstore"}
 service<http:Service> bookstoreService bind listener {
 ``` 
+
+- `@docker:Config` annotation is used to provide the basic docker image configurations for the sample. `@docker:CopyFiles` is used to copy the JMS broker jar files into the ballerina bre/lib folder. You can provide multiple files as an array to field `files` of CopyFiles docker annotation. `@docker:Expose {}` is used to expose the port. 
 
 - Now you can build a Ballerina executable archive (.balx) of the service that we developed above, using the following command. This will also create the corresponding docker image using the docker annotations that you have configured above. Navigate to `messaging-with-jms-queues/guide` and run the following command.  
   
@@ -421,7 +428,9 @@ json[] bookInventory = ["Tom Jones", "The Rainbow", "Lolita", "Atonement", "Haml
 
 @kubernetes:Deployment {
   image:"ballerina.guides.io/bookstore_service:v1.0",
-  name:"ballerina-guides-bookstore-service"
+  name:"ballerina-guides-bookstore-service",
+  copyFiles:[{target:"/ballerina/runtime/bre/lib",
+                  source:<path_to_JMS_broker_jars>}]
 }
 
 endpoint http:Listener listener {
@@ -432,7 +441,7 @@ endpoint http:Listener listener {
 service<http:Service> bookstoreService bind listener {
 ``` 
 
-- Here we have used ``  @kubernetes:Deployment `` to specify the docker image name which will be created as part of building this service. 
+- Here we have used ``  @kubernetes:Deployment `` to specify the docker image name which will be created as part of building this service. `copyFiles` field is used to copy required JMS broker jar files into the ballerina bre/lib folder. You can provide multiple files as an array to this field.
 - We have also specified `` @kubernetes:Service `` so that it will create a Kubernetes service, which will expose the Ballerina service that is running on a Pod.  
 - In addition we have used `` @kubernetes:Ingress ``, which is the external interface to access your service (with path `` /`` and host name ``ballerina.guides.io``)
 
