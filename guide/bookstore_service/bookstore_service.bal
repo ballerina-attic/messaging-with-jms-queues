@@ -18,7 +18,7 @@ import ballerina/log;
 import ballerina/http;
 import ballerina/jms;
 
-// Struct to construct a book order
+// Type definition for a book order
 type bookOrder {
     string customerName;
     string address;
@@ -30,16 +30,16 @@ type bookOrder {
 json[] bookInventory = ["Tom Jones", "The Rainbow", "Lolita", "Atonement", "Hamlet"];
 
 // Initialize a JMS connection with the provider
-// 'providerUrl' and the 'initialContextFactory' vary according to the JMS provider you use
+// 'providerUrl' and 'initialContextFactory' vary based on the JMS provider you use
 // 'Apache ActiveMQ' has been used as the message broker in this example
 jms:Connection jmsConnection = new({
-        initialContextFactory:"org.apache.activemq.jndi.ActiveMQInitialContextFactory",
-        providerUrl:"tcp://localhost:61616"
+        initialContextFactory: "org.apache.activemq.jndi.ActiveMQInitialContextFactory",
+        providerUrl: "tcp://localhost:61616"
     });
 
 // Initialize a JMS session on top of the created connection
 jms:Session jmsSession = new(jmsConnection, {
-        acknowledgementMode:"AUTO_ACKNOWLEDGE"
+        acknowledgementMode: "AUTO_ACKNOWLEDGE"
     });
 
 // Initialize a queue sender using the created session
@@ -56,8 +56,9 @@ endpoint http:Listener listener {
 // Book store service, which allows users to order books online for delivery
 @http:ServiceConfig {basePath:"/bookstore"}
 service<http:Service> bookstoreService bind listener {
-// Resource that allows users to place an order for a book
-    @http:ResourceConfig {methods:["POST"], consumes:["application/json"], produces:["application/json"]}
+    // Resource that allows users to place an order for a book
+    @http:ResourceConfig { methods: ["POST"], consumes: ["application/json"],
+        produces: ["application/json"] }
     placeOrder(endpoint caller, http:Request request) {
         http:Response response;
         bookOrder newOrder;
@@ -106,7 +107,7 @@ service<http:Service> bookstoreService bind listener {
         }
 
         json responseMessage;
-        // If requested book is available then add the order to the JMS queue 'OrderQueue'
+        // If the requested book is available, then add the order to the 'OrderQueue'
         if (isBookAvailable) {
             var bookOrderDetails = check <json>newOrder;
             // Create a JMS message
@@ -128,7 +129,7 @@ service<http:Service> bookstoreService bind listener {
         _ = caller -> respond(response);
     }
 
-// Resource that allows users to get a list of all the available books
+    // Resource that allows users to get a list of all the available books
     @http:ResourceConfig {methods:["GET"], produces:["application/json"]}
     getBookList(endpoint client, http:Request request) {
         http:Response response;
