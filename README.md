@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/pranavan15/messaging-with-jms-queues.svg?branch=master)](https://travis-ci.org/pranavan15/messaging-with-jms-queues)
+[![Build Status](https://travis-ci.org/ballerina-guides/messaging-with-jms-queues.svg?branch=master)](https://travis-ci.org/ballerina-guides/messaging-with-jms-queues)
 
 # Messaging with JMS
 
