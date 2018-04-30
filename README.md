@@ -493,7 +493,7 @@ Add `/etc/hosts` entry to match hostname.
 ```
 
 Access the service 
-``` bash
+```bash
    curl -v -X POST -d '{"Name":"Bob", "Address":"20, Palm Grove, Colombo, Sri Lanka", 
    "ContactNumber":"+94777123456", "BookName":"The Rainbow"}' \
    "http://ballerina.guides.io/bookstore/placeOrder" -H "Content-Type:application/json" 
