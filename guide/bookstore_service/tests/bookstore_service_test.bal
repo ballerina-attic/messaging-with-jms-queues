@@ -35,7 +35,7 @@ function testResourceGetBookList() {
     http:Request req;
 
     // Send a 'get' request and obtain the response
-    http:Response response = check clientEP->get("/getBookList", request = req);
+    http:Response response = check clientEP->get("/getBookList", message = req);
     // Expected response code is 200
     test:assertEquals(response.statusCode, 200, msg = "bookstore service did not respond with 200 OK signal!");
     // Check whether the response is as expected
@@ -58,7 +58,7 @@ function testResourcePlaceOrder() {
     };
     req.setJsonPayload(payload);
     // Send a 'post' request and obtain the response
-    http:Response response = check clientEP->post("/placeOrder", request = req);
+    http:Response response = check clientEP->post("/placeOrder", req);
     // Expected response code is 200
     test:assertEquals(response.statusCode, 200, msg = "bookstore service did not respond with 200 OK signal!");
     // Check whether the response is as expected
