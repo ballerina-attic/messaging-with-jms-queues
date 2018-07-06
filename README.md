@@ -33,8 +33,7 @@ Producer.
 - [Ballerina Distribution](https://ballerina.io/learn/getting-started/)
 - A JMS Broker (Example: [Apache ActiveMQ](http://activemq.apache.org/getting-started.html))
   * After installing the JMS broker, copy its .jar files into the `<BALLERINA_HOME>/bre/lib` folder
-    * For ActiveMQ 5.12.0: Copy `activemq-client-5.12.0.jar` and `geronimo-j2ee-management_1.1_spec-1.0.1.jar`
-    * Later versions of ActiveMQ (e.g., ActiveMQ 5.14.0) may additionally require copying `hawtbuf-1.11.jar`
+    * For ActiveMQ 5.15.4: Copy `activemq-client-5.15.4.jar`, `geronimo-j2ee-management_1.1_spec-1.0.1.jar` and `hawtbuf-1.11.jar`
 - A Text Editor or an IDE 
 
 ### Optional Requirements

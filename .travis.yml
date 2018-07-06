@@ -22,7 +22,7 @@ script:
 - DISTRIBUTION_NAME=ballerina-platform-$BALLERINA_VERSION
 
 # Declare variable for ActiveMQ version
-- ACTIVEMQ_VERSION="apache-activemq-5.12.0"
+- ACTIVEMQ_VERSION="apache-activemq-5.15.4"
 
 # Print STRING variable
 - echo $STRING
@@ -43,7 +43,7 @@ script:
 - echo $STRING1
 
 # Download ActiveMQ
-- wget https://archive.apache.org/dist/activemq/5.12.0/$ACTIVEMQ_VERSION-bin.tar.gz
+- wget https://archive.apache.org/dist/activemq/5.15.4/$ACTIVEMQ_VERSION-bin.tar.gz
 
 # Untar the tar file
 - tar xvzf $ACTIVEMQ_VERSION-bin.tar.gz
@@ -52,7 +52,9 @@ script:
 - ./$ACTIVEMQ_VERSION/bin/activemq start
 
 # Copy ActiveMQ jars into Ballerina lib folder
-- cp $ACTIVEMQ_VERSION/activemq-all-5.12.0.jar $DISTRIBUTION_NAME/bre/lib
+- cp $ACTIVEMQ_VERSION/lib/activemq-client-5.15.4.jar $DISTRIBUTION_NAME/bre/lib
+- cp $ACTIVEMQ_VERSION/lib/geronimo-j2ee-management_1.1_spec-1.0.1.jar $DISTRIBUTION_NAME/bre/lib
+- cp $ACTIVEMQ_VERSION/lib/hawtbuf-1.11.jar $DISTRIBUTION_NAME/bre/lib
 
 # Change the directory
 - cd guide/
