@@ -46,7 +46,7 @@ script:
 - wget https://archive.apache.org/dist/activemq/5.15.4/$ACTIVEMQ_VERSION-bin.tar.gz
 
 # Untar the tar file
-- tar xvzf $ACTIVEMQ_VERSION-bin.tar.gz
+- tar xzf $ACTIVEMQ_VERSION-bin.tar.gz
 
 # Start ActiveMQ
 - ./$ACTIVEMQ_VERSION/bin/activemq start
