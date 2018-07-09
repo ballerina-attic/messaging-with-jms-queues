@@ -19,7 +19,7 @@ import ballerina/http;
 import ballerina/jms;
 
 // Type definition for a book order
-type bookOrder {
+type bookOrder record {
     string customerName;
     string address;
     string contactNumber;
