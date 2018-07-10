@@ -133,8 +133,8 @@ import ballerina/log;
 import ballerina/http;
 import ballerina/jms;
 
-// Struct to construct an order
-type bookOrder {
+// Type definition for a book order
+type bookOrder record {
     string customerName;
     string address;
     string contactNumber;
