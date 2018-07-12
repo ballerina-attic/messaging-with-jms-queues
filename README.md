@@ -16,7 +16,7 @@ The following are the sections available in this guide.
 - [Observability](#observability)
 
 ## What you’ll build
-To understanding how you can use JMS queues for messaging, let's consider a real-world use case of an online bookstore service using which a user can order books for home delivery. Once an order placed, the service will add it to a JMS queue named "OrderQueue" if the order is valid. Hence, this bookstore service acts as the JMS message producer. An order delivery system, which acts as the JMS message consumer polls the "OrderQueue" and gets the order details whenever the queue becomes populated. The below diagram illustrates this use case.
+To understand how you can use JMS queues for messaging, let's consider a real-world use case of an online bookstore service using which a user can order books for home delivery. Once an order is placed, the service will add it to a JMS queue named "OrderQueue" if the order is valid. Hence, this bookstore service acts as the JMS message producer. An order delivery system, which acts as the JMS message consumer polls the "OrderQueue" and gets the order details whenever the queue becomes populated. The below diagram illustrates this use case.
 
 
 
@@ -43,7 +43,7 @@ Producer.
 
 ## Implementation
 
-> If you want to skip the basics, you can download the git repo and directly move to the "Testing" section by skipping "Implementation" section.    
+> If you want to skip the basics, you can download the source from the git repo and directly move to the "Testing" section by skipping "Implementation" section.    
 
 ### Create the project structure
 
@@ -108,19 +108,19 @@ service<jms:Consumer> orderDeliverySystem bind jmsConsumer {
 }
 ```
 
-In Ballerina, you can directly set the JMS configurations in the endpoint definition.
+In Ballerina, you can directly set the JMS configuration in the endpoint definition.
 
 In the above code, `orderDeliverySystem` is a JMS consumer service that handles the JMS message consuming logic. This
  service binds to a `jms:QueueReceiver` endpoint that defines the `jms:Session` and the queue to which the messages are added.
 
-`jms:Connection` is used to initialize a JMS connection with the provider details. `initialContextFactory` and `providerUrl` configurations change based on the JMS provider you use. 
+`jms:Connection` is used to initialize a JMS connection with the provider details. `initialContextFactory` and `providerUrl` configuration change based on the JMS provider you use. 
 
 `jms:Session` is used to initialize a session with the required connection properties.
 
 Resource `onMessage` will be triggered whenever the queue specified as the destination gets populated. 
 
 
-Let's next focus on the implementation of the `bookstore_service` , which contains the JMS message producing logic 
+Next let's focus on the implementation of the `bookstore_service` , which contains the JMS message producing logic 
 as well as the service logic for the online bookstore considered in this guide. This service has two resources, namely `getBookList` and `placeOrder`.
 
 Resource `getBookList` can be consumed by a user to get a list of all the available books through a GET request. The user receives a JSON response with the names of all the available books.
@@ -195,7 +195,7 @@ service<http:Service> bookstoreService bind listener {
 
 Similar to the JMS consumer, here also we require to provide JMS configuration details when defining the `jms:QueueSender` endpoint. We need to provide the JMS session and the queue to which the producer pushes the messages.   
 
-To see the complete implementation of the above, refer to the [bookstore_service.bal](https://github.com/ballerina-guides/messaging-with-jms-queues/blob/master/guide/bookstore_service/bookstore_service.bal).
+To see the complete implementation of the above, refer [bookstore_service.bal](https://github.com/ballerina-guides/messaging-with-jms-queues/blob/master/guide/bookstore_service/bookstore_service.bal).
 
 ## Testing 
 
@@ -255,7 +255,7 @@ To see the complete implementation of the above, refer to the [bookstore_service
 
 ### Writing unit tests 
 
-In Ballerina, the unit test cases should be in the same package inside a folder named as 'tests'.  When writing the test functions the below convention should be followed.
+In Ballerina, the unit test cases should be in the same package inside a folder named 'tests'.  When writing the test functions the below convention should be followed.
 - Test functions should be annotated with `@test:Config`. See the below example.
 ```ballerina
    @test:Config
@@ -269,13 +269,13 @@ To run the unit tests, navigate to `messaging-with-jms-queues/guide` and run the
    $ ballerina test
 ```
 
-When running these unit tests, make sure that the `ActiveMQ` is up and running.
+When running these unit tests, make sure that the JMS Broker is up and running.
 
-To check the implementation of the test file, refer to the [bookstore_service_test.bal](https://github.com/ballerina-guides/messaging-with-jms-queues/blob/master/guide/bookstore_service/tests/bookstore_service_test.bal).
+To check the implementation of the test file, refer [bookstore_service_test.bal](https://github.com/ballerina-guides/messaging-with-jms-queues/blob/master/guide/bookstore_service/tests/bookstore_service_test.bal).
 
 ## Deployment
 
-Once you are done with the development, you can deploy the services using any of the methods that we listed below. 
+Once you are done with the development, you can deploy the services using any of the methods listed below. 
 
 ### Deploying locally
 
@@ -299,7 +299,7 @@ As the first step, you can build Ballerina executable archives (.balx) of the se
 
 You can run the service that we developed above as a docker container.
 As Ballerina platform includes [Ballerina_Docker_Extension](https://github.com/ballerinax/docker), which offers native support for running ballerina programs on containers,
-you just need to put the corresponding docker annotations on your service code.
+you just need to add the corresponding docker annotations to your service code.
 Since this guide requires `ActiveMQ` as a prerequisite, you need a couple of more steps to configure it in docker container.   
 
 First let's see how to configure `ActiveMQ` in docker container.
@@ -388,7 +388,8 @@ service<http:Service> bookstoreService bind listener {
 
 ### Deploying on Kubernetes
 
-- You can run the service that we developed above, on Kubernetes. The Ballerina language offers native support for running a ballerina programs on Kubernetes, with the use of Kubernetes annotations that you can include as part of your service code. Also, it will take care of the creation of the docker images. So you don't need to explicitly create docker images prior to deploying it on Kubernetes. Refer to [Ballerina_Kubernetes_Extension](https://github.com/ballerinax/kubernetes) for more details and samples on Kubernetes deployment with Ballerina. You can also find details on using Minikube to deploy Ballerina programs. 
+- You can run the service that we developed above, on Kubernetes. The Ballerina language offers native support to run a Ballerina program on Kubernetes, with the use of Kubernetes annotations that you can include as part of your 
+service code. Also, it will take care of the creation of the docker images. So you don't need to explicitly create docker images prior to deploying it on Kubernetes. Refer [Ballerina_Kubernetes_Extension](https://github.com/ballerinax/kubernetes) for more details and samples on Kubernetes deployment with Ballerina. You can also find details on using Minikube to deploy Ballerina programs. 
 
 - Since this guide requires `ActiveMQ` as a prerequisite, you need an additional step to create a pod for `ActiveMQ` and use it with our sample.  
 
