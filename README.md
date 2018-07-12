@@ -43,7 +43,7 @@ Producer.
 
 ## Implementation
 
-> If you want to skip the basics, you can download the source from the git repo and directly move to the "Testing" section by skipping "Implementation" section.    
+> If you want to skip the basics, you can download the source from the git repo and directly move to the "Testing" section by skipping the "Implementation" section.    
 
 ### Create the project structure
 
