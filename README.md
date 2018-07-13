@@ -518,7 +518,7 @@ enabled=true
 
 To start the ballerina service using the configuration file, run the following command
 ```
-   $ ballerina run bookstore_service/ --config bookstore_service/ballerina.conf
+   $ ballerina run --config bookstore_service/ballerina.conf bookstore_service/
 ```
 NOTE: The above configuration is the minimum configuration needed to enable tracing and metrics. With these configurations default values are load as the other configuration parameters of metrics and tracing.
 
@@ -551,9 +551,9 @@ Follow the following steps to use tracing with Ballerina.
    -p16686:16686 p14268:14268 jaegertracing/all-in-one:latest
 ```
 
-- Navigate to `messaging-with-jms-queues/guide` and run the `bookstore_service` using following command 
+- Navigate to `messaging-with-jms-queues/guide` and run the `bookstore_service` using the following command
 ```
-   $ ballerina run bookstore_service/ --config bookstore_service/ballerina.conf
+   $ ballerina run --config bookstore_service/ballerina.conf bookstore_service/
 ```
 
 - Observe the tracing using Jaeger UI using following URL
@@ -597,9 +597,9 @@ Follow the below steps to set up Prometheus and view metrics for bookstore_servi
    prom/prometheus
 ```
 
-- Navigate to `messaging-with-jms-queues/guide` and run the `bookstore_service` using following command
+- Navigate to `messaging-with-jms-queues/guide` and run the `bookstore_service` using the following command
 ```
-   $ ballerina run bookstore_service/ --config bookstore_service/ballerina.conf
+   $ ballerina run --config bookstore_service/ballerina.conf bookstore_service/
 ```
 
 - You can access Prometheus at the following URL
