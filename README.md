@@ -300,16 +300,16 @@ As the first step, you can build Ballerina executable archives (.balx) of the se
 You can run the service that we developed above as a Docker container.
 As Ballerina platform includes [Ballerina_Docker_Extension](https://github.com/ballerinax/docker), which offers native support for running ballerina programs on containers,
 you just need to add the corresponding Docker annotations to your service code.
-Since this guide requires `ActiveMQ` as a prerequisite, you need a couple of more steps to configure it in Docker container.   
+Since this guide requires `ActiveMQ` as a prerequisite, you need a couple of more steps to configure it in a Docker container.   
 
-First let's see how to configure `ActiveMQ` in Docker container.
+First let's see how to configure `ActiveMQ` in a Docker container.
 
-- Initially, you need to pull the `ActiveMQ` Docker image using the below command.
+- Initially, you need to pull the `ActiveMQ` Docker image using the following command.
 ```bash
    $ docker pull webcenter/activemq
 ```
 
-- Then launch the pulled image using the below command. This will start the `ActiveMQ` server in Docker with default configurations.
+- Then launch the pulled image using the following command. This will start the `ActiveMQ` server in Docker with default configurations.
 ```bash
    $ docker run -d --name='activemq' -it --rm -P webcenter/activemq:latest
 ```
@@ -319,7 +319,7 @@ First let's see how to configure `ActiveMQ` in Docker container.
    $ docker ps
 ```
 
-Now let's see how we can deploy the `bookstore_service` we developed above on Docker. We need to import  `ballerinax/docker` and use the annotation `@docker:Config` as shown below to enable Docker image generation during the build time. 
+Now let's see how we can deploy the `bookstore_service` we developed above on Docker. We need to import `ballerinax/docker` and use the annotation `@docker:Config` as shown below to enable Docker image generation at build time. 
 
 ##### bookstore_service.bal
 ```ballerina
