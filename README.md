@@ -16,7 +16,7 @@ The following are the sections available in this guide.
 - [Observability](#observability)
 
 ## What you’ll build
-To understanding how you can use JMS queues for messaging, let's consider a real-world use case of an online bookstore service using which a user can order books for home delivery. Once an order placed, the service will add it to a JMS queue named "OrderQueue" if the order is valid. Hence, this bookstore service acts as the JMS message producer. An order delivery system, which acts as the JMS message consumer polls the "OrderQueue" and gets the order details whenever the queue becomes populated. The below diagram illustrates this use case.
+To understand how you can use JMS queues for messaging, let's consider a real-world use case of an online bookstore service using which a user can order books for home delivery. Once an order is placed, the service will add it to a JMS queue named "OrderQueue" if the order is valid. Hence, this bookstore service acts as the JMS message producer. An order delivery system, which acts as the JMS message consumer polls the "OrderQueue" and gets the order details whenever the queue becomes populated. The below diagram illustrates this use case.
 
 
 
@@ -43,7 +43,7 @@ Producer.
 
 ## Implementation
 
-> If you want to skip the basics, you can download the git repo and directly move to the "Testing" section by skipping "Implementation" section.    
+> If you want to skip the basics, you can download the source from the Git repo and directly move to the "Testing" section by skipping the "Implementation" section.    
 
 ### Create the project structure
 
@@ -108,19 +108,19 @@ service<jms:Consumer> orderDeliverySystem bind jmsConsumer {
 }
 ```
 
-In Ballerina, you can directly set the JMS configurations in the endpoint definition.
+In Ballerina, you can directly set the JMS configuration in the endpoint definition.
 
 In the above code, `orderDeliverySystem` is a JMS consumer service that handles the JMS message consuming logic. This
  service binds to a `jms:QueueReceiver` endpoint that defines the `jms:Session` and the queue to which the messages are added.
 
-`jms:Connection` is used to initialize a JMS connection with the provider details. `initialContextFactory` and `providerUrl` configurations change based on the JMS provider you use. 
+`jms:Connection` is used to initialize a JMS connection with the provider details. `initialContextFactory` and `providerUrl` configuration change based on the JMS provider you use. 
 
 `jms:Session` is used to initialize a session with the required connection properties.
 
 Resource `onMessage` will be triggered whenever the queue specified as the destination gets populated. 
 
 
-Let's next focus on the implementation of the `bookstore_service` , which contains the JMS message producing logic 
+Next let's focus on the implementation of the `bookstore_service` , which contains the JMS message producing logic 
 as well as the service logic for the online bookstore considered in this guide. This service has two resources, namely `getBookList` and `placeOrder`.
 
 Resource `getBookList` can be consumed by a user to get a list of all the available books through a GET request. The user receives a JSON response with the names of all the available books.
@@ -195,7 +195,7 @@ service<http:Service> bookstoreService bind listener {
 
 Similar to the JMS consumer, here also we require to provide JMS configuration details when defining the `jms:QueueSender` endpoint. We need to provide the JMS session and the queue to which the producer pushes the messages.   
 
-To see the complete implementation of the above, refer to the [bookstore_service.bal](https://github.com/ballerina-guides/messaging-with-jms-queues/blob/master/guide/bookstore_service/bookstore_service.bal).
+To see the complete implementation of the above, refer [bookstore_service.bal](https://github.com/ballerina-guides/messaging-with-jms-queues/blob/master/guide/bookstore_service/bookstore_service.bal).
 
 ## Testing 
 
@@ -255,7 +255,7 @@ To see the complete implementation of the above, refer to the [bookstore_service
 
 ### Writing unit tests 
 
-In Ballerina, the unit test cases should be in the same package inside a folder named as 'tests'.  When writing the test functions the below convention should be followed.
+In Ballerina, the unit test cases should be in the same package inside a folder named `tests`.  When writing the test functions the below convention should be followed.
 - Test functions should be annotated with `@test:Config`. See the below example.
 ```ballerina
    @test:Config
@@ -269,13 +269,13 @@ To run the unit tests, navigate to `messaging-with-jms-queues/guide` and run the
    $ ballerina test
 ```
 
-When running these unit tests, make sure that the `ActiveMQ` is up and running.
+When running these unit tests, make sure that the JMS Broker is up and running.
 
-To check the implementation of the test file, refer to the [bookstore_service_test.bal](https://github.com/ballerina-guides/messaging-with-jms-queues/blob/master/guide/bookstore_service/tests/bookstore_service_test.bal).
+To check the implementation of the test file, refer [bookstore_service_test.bal](https://github.com/ballerina-guides/messaging-with-jms-queues/blob/master/guide/bookstore_service/tests/bookstore_service_test.bal).
 
 ## Deployment
 
-Once you are done with the development, you can deploy the services using any of the methods that we listed below. 
+Once you are done with the development, you can deploy the services using any of the methods listed below. 
 
 ### Deploying locally
 
@@ -297,19 +297,19 @@ As the first step, you can build Ballerina executable archives (.balx) of the se
 
 ### Deploying on Docker
 
-You can run the service that we developed above as a docker container.
+You can run the service that we developed above as a Docker container.
 As Ballerina platform includes [Ballerina_Docker_Extension](https://github.com/ballerinax/docker), which offers native support for running ballerina programs on containers,
-you just need to put the corresponding docker annotations on your service code.
-Since this guide requires `ActiveMQ` as a prerequisite, you need a couple of more steps to configure it in docker container.   
+you just need to add the corresponding Docker annotations to your service code.
+Since this guide requires `ActiveMQ` as a prerequisite, you need a couple of more steps to configure it in a Docker container.   
 
-First let's see how to configure `ActiveMQ` in docker container.
+First let's see how to configure `ActiveMQ` in a Docker container.
 
-- Initially, you need to pull the `ActiveMQ` docker image using the below command.
+- Initially, you need to pull the `ActiveMQ` Docker image using the following command.
 ```bash
    $ docker pull webcenter/activemq
 ```
 
-- Then launch the pulled image using the below command. This will start the `ActiveMQ` server in docker with default configurations.
+- Then launch the pulled image using the following command. This will start the `ActiveMQ` server in Docker with default configurations.
 ```bash
    $ docker run -d --name='activemq' -it --rm -P webcenter/activemq:latest
 ```
@@ -319,7 +319,7 @@ First let's see how to configure `ActiveMQ` in docker container.
    $ docker ps
 ```
 
-Now let's see how we can deploy the `bookstore_service` we developed above on docker. We need to import  `ballerinax/docker` and use the annotation `@docker:Config` as shown below to enable docker image generation during the build time. 
+Now let's see how we can deploy the `bookstore_service` we developed above on Docker. We need to import `ballerinax/docker` and use the annotation `@docker:Config` as shown below to enable Docker image generation at build time. 
 
 ##### bookstore_service.bal
 ```ballerina
@@ -356,9 +356,9 @@ endpoint http:Listener listener {
 service<http:Service> bookstoreService bind listener {
 ``` 
 
-- `@docker:Config` annotation is used to provide the basic docker image configurations for the sample. `@docker:CopyFiles` is used to copy the JMS broker jar files into the ballerina bre/lib folder. You can provide multiple files as an array to field `files` of CopyFiles docker annotation. `@docker:Expose {}` is used to expose the port. 
+- `@docker:Config` annotation is used to provide the basic Docker image configurations for the sample. `@docker:CopyFiles` is used to copy the JMS broker jar files into the ballerina bre/lib folder. You can provide multiple files as an array to field `files` of CopyFiles Docker annotation. `@docker:Expose {}` is used to expose the port. 
 
-- Now you can build a Ballerina executable archive (.balx) of the service that we developed above, using the following command. This will also create the corresponding docker image using the docker annotations that you have configured above. Navigate to `messaging-with-jms-queues/guide` and run the following command.  
+- Now you can build a Ballerina executable archive (.balx) of the service that we developed above, using the following command. This will also create the corresponding Docker image using the Docker annotations that you have configured above. Navigate to `messaging-with-jms-queues/guide` and run the following command.  
   
 ```
    $ballerina build bookstore_service
@@ -367,15 +367,15 @@ service<http:Service> bookstoreService bind listener {
    docker run -d -p 9090:9090 ballerina.guides.io/bookstore_service:v1.0
 ```
 
-- Once you successfully build the docker image, you can run it with the `` docker run`` command that is shown in the previous step.  
+- Once you successfully build the Docker image, you can run it with the `` docker run`` command that is shown in the previous step.  
 
 ```bash
    $ docker run -d -p 9090:9090 ballerina.guides.io/bookstore_service:v1.0
 ```
 
-   Here we run the docker image with flag`` -p <host_port>:<container_port>`` so that we use the host port 9090 and the container port 9090. Therefore you can access the service through the host port. 
+   Here we run the Docker image with flag`` -p <host_port>:<container_port>`` so that we use the host port 9090 and the container port 9090. Therefore you can access the service through the host port. 
 
-- Verify docker container is running with the use of `` $ docker ps``. The status of the docker container should be shown as 'Up'. 
+- Verify docker container is running with the use of `` $ docker ps``. The status of the Docker container should be shown as 'Up'. 
 
 - You can access the service using the same curl commands that we've used above.
 ```bash
@@ -388,7 +388,8 @@ service<http:Service> bookstoreService bind listener {
 
 ### Deploying on Kubernetes
 
-- You can run the service that we developed above, on Kubernetes. The Ballerina language offers native support for running a ballerina programs on Kubernetes, with the use of Kubernetes annotations that you can include as part of your service code. Also, it will take care of the creation of the docker images. So you don't need to explicitly create docker images prior to deploying it on Kubernetes. Refer to [Ballerina_Kubernetes_Extension](https://github.com/ballerinax/kubernetes) for more details and samples on Kubernetes deployment with Ballerina. You can also find details on using Minikube to deploy Ballerina programs. 
+- You can run the service that we developed above, on Kubernetes. The Ballerina language offers native support to run a Ballerina program on Kubernetes, with the use of Kubernetes annotations that you can include as part of your 
+service code. Also, it will take care of the creation of the Docker images. So you don't need to explicitly create Docker images prior to deploying it on Kubernetes. Refer [Ballerina_Kubernetes_Extension](https://github.com/ballerinax/kubernetes) for more details and samples on Kubernetes deployment with Ballerina. You can also find details on using Minikube to deploy Ballerina programs. 
 
 - Since this guide requires `ActiveMQ` as a prerequisite, you need an additional step to create a pod for `ActiveMQ` and use it with our sample.  
 
@@ -441,11 +442,11 @@ endpoint http:Listener listener {
 service<http:Service> bookstoreService bind listener {
 ``` 
 
-- Here we have used ``  @kubernetes:Deployment `` to specify the docker image name which will be created as part of building this service. `copyFiles` field is used to copy required JMS broker jar files into the ballerina bre/lib folder. You can provide multiple files as an array to this field.
+- Here we have used ``  @kubernetes:Deployment `` to specify the Docker image name which will be created as part of building this service. `copyFiles` field is used to copy required JMS broker jar files into the ballerina bre/lib folder. You can provide multiple files as an array to this field.
 - We have also specified `` @kubernetes:Service `` so that it will create a Kubernetes service, which will expose the Ballerina service that is running on a Pod.  
 - In addition we have used `` @kubernetes:Ingress ``, which is the external interface to access your service (with path `` /`` and host name ``ballerina.guides.io``)
 
-- Now you can build a Ballerina executable archive (.balx) of the service that we developed above, using the following command. This will also create the corresponding docker image and the Kubernetes artifacts using the Kubernetes annotations that you have configured above.
+- Now you can build a Ballerina executable archive (.balx) of the service that we developed above, using the following command. This will also create the corresponding Docker image and the Kubernetes artifacts using the Kubernetes annotations that you have configured above.
   
 ```
    $ ballerina build bookstore_service
@@ -454,7 +455,7 @@ service<http:Service> bookstoreService bind listener {
    kubectl apply -f ./target/bookstore_service/kubernetes
 ```
 
-- You can verify that the docker image that we specified in `` @kubernetes:Deployment `` is created, by using `` docker images ``. 
+- You can verify that the Docker image that we specified in `` @kubernetes:Deployment `` is created, by using `` docker images ``. 
 - Also the Kubernetes artifacts related our service, will be generated under `` ./target/bookstore_service/kubernetes``. 
 - Now you can create the Kubernetes deployment using:
 
@@ -545,7 +546,7 @@ Follow the following steps to use tracing with Ballerina.
    reporter.max.buffer.spans=1000
 ```
 
-- Run Jaeger docker image using the following command
+- Run Jaeger Docker image using the following command
 ```bash
    $ docker run -d -p5775:5775/udp -p6831:6831/udp -p6832:6832/udp -p5778:5778 \
    -p16686:16686 p14268:14268 jaegertracing/all-in-one:latest
@@ -589,9 +590,9 @@ Follow the below steps to set up Prometheus and view metrics for bookstore_servi
          - targets: ['172.17.0.1:9797']
 ```
 
-   NOTE : Replace `172.17.0.1` if your local docker IP differs from `172.17.0.1`
+   NOTE : Replace `172.17.0.1` if your local Docker IP differs from `172.17.0.1`
    
-- Run the Prometheus docker image using the following command
+- Run the Prometheus Docker image using the following command
 ```
    $ docker run -p 19090:9090 -v /tmp/prometheus.yml:/etc/prometheus/prometheus.yml \
    prom/prometheus

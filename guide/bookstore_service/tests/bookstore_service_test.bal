@@ -17,12 +17,6 @@
 import ballerina/http;
 import ballerina/test;
 
-@test:BeforeSuite
-function beforeFunc() {
-    // Start the 'bookstoreService' before running the test
-    _ = test:startServices("bookstore_service");
-}
-
 // Client endpoint
 endpoint http:Client clientEP {
     url: "http://localhost:9090/bookstore"
@@ -65,10 +59,4 @@ function testResourcePlaceOrder() {
     json resPayload = check response.getJsonPayload();
     json expected = { "Message": "Your order is successfully placed. Ordered book will be delivered soon" };
     test:assertEquals(resPayload, expected, msg = "Response mismatch!");
-}
-
-@test:AfterSuite
-function afterFunc() {
-    // Start the 'bookstoreService' before running the test
-    test:stopServices("bookstore_service");
 }
