@@ -452,15 +452,15 @@ service<http:Service> bookstoreService bind listener {
    $ ballerina build bookstore_service
   
    Run following command to deploy kubernetes artifacts:  
-   kubectl apply -f ./target/bookstore_service/kubernetes
+   kubectl apply -f ./target/kubernetes/bookstore_service
 ```
 
 - You can verify that the Docker image that we specified in `` @kubernetes:Deployment `` is created, by using `` docker images ``. 
-- Also the Kubernetes artifacts related our service, will be generated under `` ./target/bookstore_service/kubernetes``. 
+- Also the Kubernetes artifacts related our service, will be generated under `` ./target/kubernetes/bookstore_service``. 
 - Now you can create the Kubernetes deployment using:
 
 ```bash
-   $ kubectl apply -f ./target/bookstore_service/kubernetes 
+   $ kubectl apply -f ./target/kubernetes/bookstore_service 
  
    deployment.extensions "ballerina-guides-bookstore-service" created
    ingress.extensions "ballerina-guides-bookstore-service" created
