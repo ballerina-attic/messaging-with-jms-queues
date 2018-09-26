@@ -208,11 +208,11 @@ To see the complete implementation of the above, refer [bookstore_service.bal](h
 
 - Navigate to `messaging-with-jms-queues/guide` and run the following commands in separate terminals to start both the JMS producer `bookstoreService` and  JMS consumer `orderDeliverySystem`.
 ```bash
-   $ ballerina run bookstore_service
+   $ ballerina run bookstore_service.bal
 ```
 
 ```bash
-   $ ballerina run order_delivery_system
+   $ ballerina run order_delivery_system.bal
 ```
    
 - Invoke the `bookstoreService` by sending a GET request to check the available books.
