@@ -291,7 +291,7 @@ As the first step, you can build Ballerina executable archives (.balx) of the se
 
 - The successful execution of a service will show us something similar to the following output.
 ```
-   ballerina: initiating service(s) in 'target/bookstore_service.balx'
+   Initiating service(s) in 'target/bookstore_service.balx'
    ballerina: started HTTP/WS endpoint 0.0.0.0:9090
 ```
 

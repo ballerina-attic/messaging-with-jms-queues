@@ -44,17 +44,17 @@ jms:Session jmsSession = new(jmsConnection, {
 
 // Initialize a queue sender using the created session
 endpoint jms:QueueSender jmsProducer {
-    session:jmsSession,
-    queueName:"OrderQueue"
+    session: jmsSession,
+    queueName: "OrderQueue"
 };
 
 // Service endpoint
 endpoint http:Listener listener {
-    port:9090
+    port: 9090
 };
 
 // Book store service, which allows users to order books online for delivery
-@http:ServiceConfig {basePath:"/bookstore"}
+@http:ServiceConfig { basePath: "/bookstore" }
 service<http:Service> bookstoreService bind listener {
     // Resource that allows users to place an order for a book
     @http:ResourceConfig { methods: ["POST"], consumes: ["application/json"],
@@ -71,8 +71,8 @@ service<http:Service> bookstoreService bind listener {
             // NOT a valid JSON payload
             any => {
                 response.statusCode = 400;
-                response.setJsonPayload({"Message":"Invalid payload - Not a valid JSON payload"});
-                _ = caller -> respond(response);
+                response.setJsonPayload({ "Message": "Invalid payload - Not a valid JSON payload" });
+                _ = caller->respond(response);
                 done;
             }
         }
@@ -85,8 +85,8 @@ service<http:Service> bookstoreService bind listener {
         // If payload parsing fails, send a "Bad Request" message as the response
         if (name == null || address == null || contact == null || bookName == null) {
             response.statusCode = 400;
-            response.setJsonPayload({"Message":"Bad Request - Invalid payload"});
-            _ = caller -> respond(response);
+            response.setJsonPayload({ "Message": "Bad Request - Invalid payload" });
+            _ = caller->respond(response);
             done;
         }
 
@@ -113,28 +113,28 @@ service<http:Service> bookstoreService bind listener {
             // Create a JMS message
             jms:Message queueMessage = check jmsSession.createTextMessage(bookOrderDetails.toString());
             // Send the message to the JMS queue
-            _ = jmsProducer -> send(queueMessage);
+            _ = jmsProducer->send(queueMessage);
             // Construct a success message for the response
-            responseMessage = {"Message":"Your order is successfully placed. Ordered book will be delivered soon"};
+            responseMessage = { "Message": "Your order is successfully placed. Ordered book will be delivered soon" };
             log:printInfo("New order added to the JMS Queue; CustomerName: '" + newOrder.customerName +
                     "', OrderedBook: '" + newOrder.orderedBookName + "';");
         }
         else {
             // If book is not available, construct a proper response message to notify user
-            responseMessage = {"Message":"Requested book not available"};
+            responseMessage = { "Message": "Requested book not available" };
         }
 
         // Send response to the user
         response.setJsonPayload(responseMessage);
-        _ = caller -> respond(response);
+        _ = caller->respond(response);
     }
 
     // Resource that allows users to get a list of all the available books
-    @http:ResourceConfig {methods:["GET"], produces:["application/json"]}
+    @http:ResourceConfig { methods: ["GET"], produces: ["application/json"] }
     getBookList(endpoint client, http:Request request) {
         http:Response response;
         // Send json array 'bookInventory' as the response, which contains all the available books
         response.setJsonPayload(bookInventory);
-        _ = client -> respond(response);
+        _ = client->respond(response);
     }
 }
