@@ -218,7 +218,7 @@ To see the complete implementation of the above, refer [bookstore_service.bal](h
 - Invoke the `bookstoreService` by sending a GET request to check the available books.
 
 ```bash
-   curl -v -X GET localhost:9090/bookstore/getBookList
+   $ curl -v -X GET localhost:9090/bookstore/getBookList
 ```
 
   The bookstoreService sends a response similar to the following.
@@ -230,7 +230,7 @@ To see the complete implementation of the above, refer [bookstore_service.bal](h
 - Place an order using the following command.
 
 ```bash
-   curl -v -X POST -d \
+   $ curl -v -X POST -d \
    '{"Name":"Bob", "Address":"20, Palm Grove, Colombo, Sri Lanka", 
    "ContactNumber":"+94777123456", "BookName":"The Rainbow"}' \
    "http://localhost:9090/bookstore/placeOrder" -H "Content-Type:application/json"
@@ -243,7 +243,7 @@ To see the complete implementation of the above, refer [bookstore_service.bal](h
 ```
 
   Sample Log Messages:
-```bash
+```
     INFO  [bookstore_service] - New order added to the JMS Queue;
         CustomerName: 'Bob', OrderedBook: 'The Rainbow';
 
@@ -360,8 +360,8 @@ service<http:Service> bookstoreService bind listener {
 
 - Now you can build a Ballerina executable archive (.balx) of the service that we developed above, using the following command. This will also create the corresponding Docker image using the Docker annotations that you have configured above. Navigate to `messaging-with-jms-queues/guide` and run the following command.  
   
-```
-   $ballerina build bookstore_service
+```bash
+   $ ballerina build bookstore_service
   
    Run following command to start docker container: 
    docker run -d -p 9090:9090 ballerina.guides.io/bookstore_service:v1.0
@@ -379,7 +379,7 @@ service<http:Service> bookstoreService bind listener {
 
 - You can access the service using the same curl commands that we've used above.
 ```bash
-   curl -v -X POST -d \
+   $ curl -v -X POST -d \
    '{"Name":"Bob", "Address":"20, Palm Grove, Colombo, Sri Lanka", 
    "ContactNumber":"+94777123456", "BookName":"The Rainbow"}' \
    "http://localhost:9090/bookstore/placeOrder" -H "Content-Type:application/json"
@@ -448,7 +448,7 @@ service<http:Service> bookstoreService bind listener {
 
 - Now you can build a Ballerina executable archive (.balx) of the service that we developed above, using the following command. This will also create the corresponding Docker image and the Kubernetes artifacts using the Kubernetes annotations that you have configured above.
   
-```
+```bash
    $ ballerina build bookstore_service
   
    Run following command to deploy kubernetes artifacts:  
@@ -480,7 +480,7 @@ service<http:Service> bookstoreService bind listener {
 
 Node Port:
 ```bash
-   curl -v -X POST -d '{"Name":"Bob", "Address":"20, Palm Grove, Colombo, Sri Lanka", 
+   $ curl -v -X POST -d '{"Name":"Bob", "Address":"20, Palm Grove, Colombo, Sri Lanka", 
    "ContactNumber":"+94777123456", "BookName":"The Rainbow"}' \
    "http://localhost:<Node_Port>/bookstore/placeOrder" -H \
    "Content-Type:application/json"  
@@ -553,7 +553,7 @@ Follow the following steps to use tracing with Ballerina.
 ```
 
 - Navigate to `messaging-with-jms-queues/guide` and run the `bookstore_service` using the following command
-```
+```bash
    $ ballerina run --config bookstore_service/ballerina.conf bookstore_service/
 ```
 
@@ -593,13 +593,13 @@ Follow the below steps to set up Prometheus and view metrics for bookstore_servi
    NOTE : Replace `172.17.0.1` if your local Docker IP differs from `172.17.0.1`
    
 - Run the Prometheus Docker image using the following command
-```
+```bash
    $ docker run -p 19090:9090 -v /tmp/prometheus.yml:/etc/prometheus/prometheus.yml \
    prom/prometheus
 ```
 
 - Navigate to `messaging-with-jms-queues/guide` and run the `bookstore_service` using the following command
-```
+```bash
    $ ballerina run --config bookstore_service/ballerina.conf bookstore_service/
 ```
 
@@ -618,7 +618,7 @@ NOTE:  Ballerina will by default have following metrics for HTTP server connecto
 Ballerina has a log package for logging to the console. You can import ballerina/log package and start logging. The following section will describe how to search, analyze, and visualize logs in real time using Elastic Stack.
 
 - Start the Ballerina Service with the following command from `messaging-with-jms-queues/guide`
-```
+```bash
    $ nohup ballerina run bookstore_service/ &>> ballerina.log&
 ```
    NOTE: This will write the console log to the `ballerina.log` file in the `messaging-with-jms-queues/guide` directory
@@ -626,7 +626,7 @@ Ballerina has a log package for logging to the console. You can import ballerina
 - Start Elasticsearch using the following command
 
 - Start Elasticsearch using the following command
-```
+```bash
    $ docker run -p 9200:9200 -p 9300:9300 -it -h elasticsearch --name \
    elasticsearch docker.elastic.co/elasticsearch/elasticsearch:6.2.2 
 ```
@@ -634,7 +634,7 @@ Ballerina has a log package for logging to the console. You can import ballerina
    NOTE: Linux users might need to run `sudo sysctl -w vm.max_map_count=262144` to increase `vm.max_map_count` 
    
 - Start Kibana plugin for data visualization with Elasticsearch
-```
+```bash
    $ docker run -p 5601:5601 -h kibana --name kibana --link \
    elasticsearch:elasticsearch docker.elastic.co/kibana/kibana:6.2.2     
 ```
@@ -671,10 +671,10 @@ ii) Save the above `logstash.conf` inside a directory named as `{SAMPLE_ROOT}\pi
      
 iii) Start the logstash container, replace the {SAMPLE_ROOT} with your directory name
      
-```
-$ docker run -h logstash --name logstash --link elasticsearch:elasticsearch \
--it --rm -v ~/{SAMPLE_ROOT}/pipeline:/usr/share/logstash/pipeline/ \
--p 5044:5044 docker.elastic.co/logstash/logstash:6.2.2
+```bash
+   $ docker run -h logstash --name logstash --link elasticsearch:elasticsearch \
+   -it --rm -v ~/{SAMPLE_ROOT}/pipeline:/usr/share/logstash/pipeline/ \
+   -p 5044:5044 docker.elastic.co/logstash/logstash:6.2.2
 ```
   
  - Configure filebeat to ship the ballerina logs
@@ -694,10 +694,10 @@ ii) Save the above `filebeat.yml` inside a directory named as `{SAMPLE_ROOT}\fil
         
 iii) Start the logstash container, replace the {SAMPLE_ROOT} with your directory name
      
-```
-$ docker run -v {SAMPLE_ROOT}/filbeat/filebeat.yml:/usr/share/filebeat/filebeat.yml \
--v {SAMPLE_ROOT}/guide/bookstore_service/ballerina.log:/usr/share\
-/filebeat/ballerina.log --link logstash:logstash docker.elastic.co/beats/filebeat:6.2.2
+```bash 
+   $ docker run -v {SAMPLE_ROOT}/filbeat/filebeat.yml:/usr/share/filebeat/filebeat.yml \
+   -v {SAMPLE_ROOT}/guide/bookstore_service/ballerina.log:/usr/share\
+   /filebeat/ballerina.log --link logstash:logstash docker.elastic.co/beats/filebeat:6.2.2
 ```
  
  - Access Kibana to visualize the logs using following URL
