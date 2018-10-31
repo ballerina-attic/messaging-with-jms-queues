@@ -452,7 +452,7 @@ service<http:Service> bookstoreService bind listener {
    $ ballerina build bookstore_service
   
    Run following command to deploy kubernetes artifacts:  
-   kubectl apply -f ./target/kubernetes/bookstore_service
+   $ kubectl apply -f ./target/kubernetes/bookstore_service
 ```
 
 - You can verify that the Docker image that we specified in `` @kubernetes:Deployment `` is created, by using `` docker images ``. 
@@ -495,7 +495,7 @@ Add `/etc/hosts` entry to match hostname.
 
 Access the service 
 ```bash
-   curl -v -X POST -d '{"Name":"Bob", "Address":"20, Palm Grove, Colombo, Sri Lanka", 
+   $ curl -v -X POST -d '{"Name":"Bob", "Address":"20, Palm Grove, Colombo, Sri Lanka", 
    "ContactNumber":"+94777123456", "BookName":"The Rainbow"}' \
    "http://ballerina.guides.io/bookstore/placeOrder" -H "Content-Type:application/json" 
 ```
