@@ -20,10 +20,10 @@ import ballerina/jms;
 
 // Type definition for a book order
 type bookOrder record {
-    string customerName;
-    string address;
-    string contactNumber;
-    string orderedBookName;
+    string customerName?;
+    string address?;
+    string contactNumber?;
+    string orderedBookName?;
 };
 
 // Global variable containing all the available books
@@ -43,38 +43,42 @@ jms:Session jmsSession = new(jmsConnection, {
     });
 
 // Initialize a queue sender using the created session
-endpoint jms:QueueSender jmsProducer {
-    session: jmsSession,
-    queueName: "OrderQueue"
-};
+jms:QueueSender jmsProducer = new({
+        session: jmsSession,
+        queueName: "OrderQueue"
+    });
 
 // Service endpoint
-endpoint http:Listener listener {
-    port: 9090
-};
+listener http:Listener httpListener = new(9090);
 
 // Book store service, which allows users to order books online for delivery
 @http:ServiceConfig { basePath: "/bookstore" }
-service<http:Service> bookstoreService bind listener {
+service bookstoreService on httpListener {
     // Resource that allows users to place an order for a book
-    @http:ResourceConfig { methods: ["POST"], consumes: ["application/json"],
-        produces: ["application/json"] }
-    placeOrder(endpoint caller, http:Request request) {
-        http:Response response;
-        bookOrder newOrder;
-        json reqPayload;
+    @http:ResourceConfig {
+        methods: ["POST"],
+        consumes: ["application/json"],
+        produces: ["application/json"]
+    }
+    resource function placeOrder(http:Caller caller, http:Request request) {
+        http:Response response = new;
+        bookOrder newOrder = {};
+        json reqPayload = ();
 
         // Try parsing the JSON payload from the request
-        match request.getJsonPayload() {
+        var payload = request.getJsonPayload();
+        if (payload is json) {
             // Valid JSON payload
-            json payload => reqPayload = payload;
-            // NOT a valid JSON payload
-            any => {
-                response.statusCode = 400;
-                response.setJsonPayload({ "Message": "Invalid payload - Not a valid JSON payload" });
-                _ = caller->respond(response);
-                done;
+            reqPayload = payload;
+        } else {
+            // Not a valid JSON payload
+            response.statusCode = 400;
+            response.setJsonPayload({ "Message": "Invalid payload - Not a valid JSON payload" });
+            var result = caller->respond(response);
+            if (result is error) {
+                log:printError("Error sending response", err = result);
             }
+            return;
         }
 
         json name = reqPayload.Name;
@@ -86,8 +90,11 @@ service<http:Service> bookstoreService bind listener {
         if (name == null || address == null || contact == null || bookName == null) {
             response.statusCode = 400;
             response.setJsonPayload({ "Message": "Bad Request - Invalid payload" });
-            _ = caller->respond(response);
-            done;
+            var result = caller->respond(response);
+            if (result is error) {
+                log:printError("Error sending response", err = result);
+            }
+            return;
         }
 
         // Order details
@@ -97,27 +104,36 @@ service<http:Service> bookstoreService bind listener {
         newOrder.orderedBookName = bookName.toString();
 
         // boolean variable to track the availability of a requested book
-        boolean isBookAvailable;
-        // Check whether the requested book available
-        foreach book in bookInventory {
+        boolean isBookAvailable = false;
+        // Check whether the requested book is available
+        foreach var book in bookInventory {
             if (newOrder.orderedBookName.equalsIgnoreCase(book.toString())) {
                 isBookAvailable = true;
                 break;
             }
         }
 
-        json responseMessage;
+        json responseMessage = ();
         // If the requested book is available, then add the order to the 'OrderQueue'
         if (isBookAvailable) {
-            var bookOrderDetails = check <json>newOrder;
+            var bookOrderDetails = json.convert(newOrder);
             // Create a JMS message
-            jms:Message queueMessage = check jmsSession.createTextMessage(bookOrderDetails.toString());
-            // Send the message to the JMS queue
-            _ = jmsProducer->send(queueMessage);
-            // Construct a success message for the response
-            responseMessage = { "Message": "Your order is successfully placed. Ordered book will be delivered soon" };
-            log:printInfo("New order added to the JMS Queue; CustomerName: '" + newOrder.customerName +
-                    "', OrderedBook: '" + newOrder.orderedBookName + "';");
+            if (bookOrderDetails is json) {
+                var queueMessage = jmsSession.createTextMessage(bookOrderDetails.toString());
+                if (queueMessage is jms:Message) {
+                    // Send the message to the JMS queue
+                    var result = jmsProducer->send(queueMessage);
+                    if (result is error) {
+                        log:printError("Error sending the message", err = result);
+                    }
+                    // Construct a success message for the response
+                    responseMessage = { "Message": "Your order is successfully placed."
+                            + " Ordered book will be delivered soon" };
+                    log:printInfo("New order added to the JMS Queue; CustomerName: '"
+                            + newOrder.customerName + "', OrderedBook: '"
+                            + newOrder.orderedBookName + "';");
+                }
+            }
         }
         else {
             // If book is not available, construct a proper response message to notify user
@@ -126,15 +142,24 @@ service<http:Service> bookstoreService bind listener {
 
         // Send response to the user
         response.setJsonPayload(responseMessage);
-        _ = caller->respond(response);
+        var result = caller->respond(response);
+        if (result is error) {
+            log:printError("Error sending response", err = result);
+        }
     }
 
     // Resource that allows users to get a list of all the available books
-    @http:ResourceConfig { methods: ["GET"], produces: ["application/json"] }
-    getBookList(endpoint client, http:Request request) {
-        http:Response response;
+    @http:ResourceConfig {
+        methods: ["GET"],
+        produces: ["application/json"]
+    }
+    resource function getBookList(http:Caller caller, http:Request request) {
+        http:Response response = new;
         // Send json array 'bookInventory' as the response, which contains all the available books
         response.setJsonPayload(bookInventory);
-        _ = client->respond(response);
+        var result = caller->respond(response);
+        if (result is error) {
+            log:printError("Error sending response", err = result);
+        }
     }
 }
