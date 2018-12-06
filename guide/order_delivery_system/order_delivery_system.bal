@@ -31,19 +31,23 @@ jms:Session jmsSession = new(conn, {
     });
 
 // Initialize a queue receiver using the created session
-endpoint jms:QueueReceiver jmsConsumer {
-    session: jmsSession,
-    queueName: "OrderQueue"
-};
+listener jms:QueueReceiver jmsConsumer = new({
+        session: jmsSession,
+        queueName: "OrderQueue"
+    });
 
 // JMS service that consumes messages from the JMS queue
-// Bind the created consumer to the listener service
-service<jms:Consumer> orderDeliverySystem bind jmsConsumer {
+// Attach service to the created JMS consumer
+service orderDeliverySystem on jmsConsumer {
     // Triggered whenever an order is added to the 'OrderQueue'
-    onMessage(endpoint consumer, jms:Message message) {
+    resource function onMessage(jms:QueueReceiverCaller consumer, jms:Message message) {
         log:printInfo("New order received from the JMS Queue");
         // Retrieve the string payload using native function
-        string stringPayload = check message.getTextMessageContent();
-        log:printInfo("Order Details: " + stringPayload);
+        var stringPayload = message.getTextMessageContent();
+        if (stringPayload is string) {
+            log:printInfo("Order Details: " + stringPayload);
+        } else {
+            log:printInfo("Error occurred while retrieving the order details");
+        }
     }
 }

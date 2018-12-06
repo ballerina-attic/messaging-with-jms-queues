@@ -18,31 +18,37 @@ import ballerina/http;
 import ballerina/test;
 
 // Client endpoint
-endpoint http:Client clientEP {
-    url: "http://localhost:9090/bookstore"
-};
+http:Client clientEP = new("http://localhost:9090/bookstore");
 
 // Function to test 'getBookList' resource
 @test:Config
 function testResourceGetBookList() {
     // Initialize the empty http request
-    http:Request req;
+    http:Request req = new;
 
     // Send a 'get' request and obtain the response
-    http:Response response = check clientEP->get("/getBookList", message = req);
-    // Expected response code is 200
-    test:assertEquals(response.statusCode, 200, msg = "bookstore service did not respond with 200 OK signal!");
-    // Check whether the response is as expected
-    json resPayload = check response.getJsonPayload();
-    string stringPayload = resPayload.toString();
-    test:assertTrue(stringPayload.contains("Lolita"), msg = "Response mismatch!");
+    var response = clientEP->get("/getBookList", message = req);
+    if (response is http:Response) {
+        // Expected response code is 200
+        test:assertEquals(response.statusCode, 200, msg = "bookstore service did not respond with 200 OK signal!");
+        // Check whether the response is as expected
+        var resPayload = response.getJsonPayload();
+        if (resPayload is json) {
+            string stringPayload = resPayload.toString();
+            test:assertTrue(stringPayload.contains("Lolita"), msg = "Response mismatch!");
+        } else {
+            test:assertFail(msg = "Failed to retrieve the payload");
+        }
+    } else {
+        test:assertFail(msg = "Error sending request");
+    }
 }
 
 // Function to test 'placeOrder' resource
 @test:Config
 function testResourcePlaceOrder() {
     // Initialize the empty http request
-    http:Request req;
+    http:Request req = new;
     // Construct a request payload
     json payload = {
         "Name": "Alice",
@@ -52,11 +58,19 @@ function testResourcePlaceOrder() {
     };
     req.setJsonPayload(payload);
     // Send a 'post' request and obtain the response
-    http:Response response = check clientEP->post("/placeOrder", req);
-    // Expected response code is 200
-    test:assertEquals(response.statusCode, 200, msg = "bookstore service did not respond with 200 OK signal!");
-    // Check whether the response is as expected
-    json resPayload = check response.getJsonPayload();
-    json expected = { "Message": "Your order is successfully placed. Ordered book will be delivered soon" };
-    test:assertEquals(resPayload, expected, msg = "Response mismatch!");
+    var response = clientEP->post("/placeOrder", req);
+    if (response is http:Response) {
+        // Expected response code is 200
+        test:assertEquals(response.statusCode, 200, msg = "bookstore service did not respond with 200 OK signal!");
+        // Check whether the response is as expected
+        var resPayload = response.getJsonPayload();
+        if (resPayload is json) {
+            json expected = { "Message": "Your order is successfully placed. Ordered book will be delivered soon" };
+            test:assertEquals(resPayload, expected, msg = "Response mismatch!");
+        } else {
+            test:assertFail(msg = "Failed to retrieve the payload");
+        }
+    } else {
+        test:assertFail(msg = "Error sending request");
+    }
 }
