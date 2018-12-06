@@ -79,31 +79,35 @@ import ballerina/jms;
 // Initialize a JMS connection with the provider
 // 'Apache ActiveMQ' has been used as the message broker
 jms:Connection conn = new({
-    initialContextFactory:"org.apache.activemq.jndi.ActiveMQInitialContextFactory",
-    providerUrl:"tcp://localhost:61616"
-});
+         initialContextFactory:"org.apache.activemq.jndi.ActiveMQInitialContextFactory",
+         providerUrl:"tcp://localhost:61616"
+    });
 
 // Initialize a JMS session on top of the created connection
 jms:Session jmsSession = new(conn, {
-    // Optional property. Defaults to AUTO_ACKNOWLEDGE
-    acknowledgementMode:"AUTO_ACKNOWLEDGE"
-});
+        // Optional property. Defaults to AUTO_ACKNOWLEDGE
+        acknowledgementMode:"AUTO_ACKNOWLEDGE"
+    });
 
 // Initialize a queue receiver using the created session
-endpoint jms:QueueReceiver jmsConsumer {
-    session:jmsSession,
-    queueName:"OrderQueue"
-};
+jms:QueueReceiver jmsConsumer = new({
+        session:jmsSession,
+        queueName:"OrderQueue"
+    });
 
 // JMS service that consumes messages from the JMS queue
-// Bind the created consumer to the listener service
-service<jms:Consumer> orderDeliverySystem bind jmsConsumer {
+// Attach the service to the created JMS consumer 
+service orderDeliverySystem on jmsConsumer {
     // Triggered whenever an order is added to the 'OrderQueue'
-    onMessage(endpoint consumer, jms:Message message) {
+    resource function onMessage(jms:QueueReceiverCaller consumer, jms:Message message) {
         log:printInfo("New order received from the JMS Queue");
         // Retrieve the string payload using native function
-        string stringPayload = check message.getTextMessageContent();
-        log:printInfo("Order Details: " + stringPayload);
+        var stringPayload = message.getTextMessageContent();
+        if (stringPayload is string) {
+            log:printInfo("Order Details: " + stringPayload);
+        } else {
+            log:printInfo("Error occurred while retrieving the order details");
+        }
     }
 }
 ```
@@ -111,7 +115,7 @@ service<jms:Consumer> orderDeliverySystem bind jmsConsumer {
 In Ballerina, you can directly set the JMS configuration in the endpoint definition.
 
 In the above code, `orderDeliverySystem` is a JMS consumer service that handles the JMS message consuming logic. This
- service binds to a `jms:QueueReceiver` endpoint that defines the `jms:Session` and the queue to which the messages are added.
+ service is attached to a `jms:QueueReceiver` endpoint that defines the `jms:Session` and the queue to which the messages are added.
 
 `jms:Connection` is used to initialize a JMS connection with the provider details. `initialContextFactory` and `providerUrl` configuration change based on the JMS provider you use. 
 
@@ -135,10 +139,10 @@ import ballerina/jms;
 
 // Type definition for a book order
 type bookOrder record {
-    string customerName;
-    string address;
-    string contactNumber;
-    string orderedBookName;
+    string customerName?;
+    string address?;
+    string contactNumber?;
+    string orderedBookName?;
 };
 
 // Global variable containing all the available books
@@ -148,34 +152,34 @@ json[] bookInventory = ["Tom Jones", "The Rainbow", "Lolita", "Atonement", "Haml
 // 'providerUrl' and 'initialContextFactory' vary based on the JMS provider you use
 // 'Apache ActiveMQ' has been used as the message broker in this example
 jms:Connection jmsConnection = new({
-    initialContextFactory:"org.apache.activemq.jndi.ActiveMQInitialContextFactory",
-    providerUrl:"tcp://localhost:61616"
-});
+        initialContextFactory: "org.apache.activemq.jndi.ActiveMQInitialContextFactory",
+        providerUrl: "tcp://localhost:61616"
+    });
 
 // Initialize a JMS session on top of the created connection
 jms:Session jmsSession = new(jmsConnection, {
-    acknowledgementMode:"AUTO_ACKNOWLEDGE"
-});
+        acknowledgementMode: "AUTO_ACKNOWLEDGE"
+    });
 
 // Initialize a queue sender using the created session
-endpoint jms:QueueSender jmsProducer {
-    session:jmsSession,
-    queueName:"OrderQueue"
-};
+jms:QueueSender jmsProducer = new({
+        session: jmsSession,
+        queueName: "OrderQueue"
+    });
 
 // Service endpoint
-endpoint http:Listener listener {
-    port:9090
-};
+listener http:Listener httpListener = new(9090);
 
 // Book store service, which allows users to order books online for delivery
-@http:ServiceConfig {basePath:"/bookstore"}
-service<http:Service> bookstoreService bind listener {
+@http:ServiceConfig { basePath: "/bookstore" }
+service bookstoreService on httpListener {
     // Resource that allows users to place an order for a book
-    @http:ResourceConfig {methods:["POST"], consumes:["application/json"],
-        produces:["application/json"]}
-    placeOrder(endpoint caller, http:Request request) {
-     
+    @http:ResourceConfig {
+        methods: ["POST"],
+        consumes: ["application/json"],
+        produces: ["application/json"]
+    }
+    resource function placeOrder(http:Caller caller, http:Request request) {
         // Try parsing the JSON payload from the request
   
         // Check whether the requested book is available
@@ -186,9 +190,12 @@ service<http:Service> bookstoreService bind listener {
     }
 
     // Resource that allows users to get a list of all the available books
-    @http:ResourceConfig {methods:["GET"], produces:["application/json"]}
-    getBookList(endpoint client, http:Request request) {
-      // Send a JSON response with all the available books  
+    @http:ResourceConfig {
+        methods: ["GET"],
+        produces: ["application/json"]
+    }
+    resource function getBookList(http:Caller caller, http:Request request) {
+        // Send a JSON response with all the available books  
     }
 }
 ```
@@ -348,20 +355,20 @@ json[] bookInventory = ["Tom Jones", "The Rainbow", "Lolita", "Atonement", "Haml
 }
 
 @docker:Expose{}
-endpoint http:Listener listener {
-    port:9090
-};
+listener http:Listener httpListener = new(9090);
 
 @http:ServiceConfig {basePath:"/bookstore"}
-service<http:Service> bookstoreService bind listener {
+service bookstoreService on httpListener {
 ``` 
+
+>NOTE: Replace "localhost" in the provider URL of the JMS connection definition, with the IP address of the running `ActiveMQ` server container in Docker.
 
 - `@docker:Config` annotation is used to provide the basic Docker image configurations for the sample. `@docker:CopyFiles` is used to copy the JMS broker jar files into the ballerina bre/lib folder. You can provide multiple files as an array to field `files` of CopyFiles Docker annotation. `@docker:Expose {}` is used to expose the port. 
 
 - Now you can build a Ballerina executable archive (.balx) of the service that we developed above, using the following command. This will also create the corresponding Docker image using the Docker annotations that you have configured above. Navigate to `messaging-with-jms-queues/guide` and run the following command.  
   
 ```bash
-   $ ballerina build bookstore_service
+   $ ballerina build bookstore_service --skiptests
   
    Run following command to start docker container: 
    docker run -d -p 9090:9090 ballerina.guides.io/bookstore_service:v1.0
@@ -410,7 +417,7 @@ import ballerinax/kubernetes;
 
 json[] bookInventory = ["Tom Jones", "The Rainbow", "Lolita", "Atonement", "Hamlet"];
 
-// 'jms:Connection' definition
+// 'jms:Connection' definition 
 
 // 'jms:Session' definition
 
@@ -434,12 +441,10 @@ json[] bookInventory = ["Tom Jones", "The Rainbow", "Lolita", "Atonement", "Haml
                   source:<path_to_JMS_broker_jars>}]
 }
 
-endpoint http:Listener listener {
-    port:9090
-};
+listener http:Listener httpListener = new(9090);
 
 @http:ServiceConfig {basePath:"/bookstore"}
-service<http:Service> bookstoreService bind listener {
+service bookstoreService on httpListener {
 ``` 
 
 - Here we have used ``  @kubernetes:Deployment `` to specify the Docker image name which will be created as part of building this service. `copyFiles` field is used to copy required JMS broker jar files into the ballerina bre/lib folder. You can provide multiple files as an array to this field.
@@ -521,7 +526,7 @@ To start the ballerina service using the configuration file, run the following c
 ```
    $ ballerina run --config bookstore_service/ballerina.conf bookstore_service/
 ```
-NOTE: The above configuration is the minimum configuration needed to enable tracing and metrics. With these configurations default values are load as the other configuration parameters of metrics and tracing.
+>NOTE: The above configuration is the minimum configuration needed to enable tracing and metrics. With these configurations default values are load as the other configuration parameters of metrics and tracing.
 
 ### Tracing 
 
@@ -590,7 +595,7 @@ Follow the below steps to set up Prometheus and view metrics for bookstore_servi
          - targets: ['172.17.0.1:9797']
 ```
 
-   NOTE : Replace `172.17.0.1` if your local Docker IP differs from `172.17.0.1`
+>NOTE : Replace `172.17.0.1` if your local Docker IP differs from `172.17.0.1`
    
 - Run the Prometheus Docker image using the following command
 ```bash
