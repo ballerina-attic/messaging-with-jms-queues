@@ -43,10 +43,7 @@ jms:Session jmsSession = new(jmsConnection, {
     });
 
 // Initialize a queue sender using the created session
-jms:QueueSender jmsProducer = new({
-        session: jmsSession,
-        queueName: "OrderQueue"
-    });
+jms:QueueSender jmsProducer = new(jmsSession, queueName = "OrderQueue");
 
 // Service endpoint
 listener http:Listener httpListener = new(9090);
